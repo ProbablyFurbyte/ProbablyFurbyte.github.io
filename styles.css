@@ -1,0 +1,178 @@
+:root {
+    --bg-color: #1E1B24;
+    --glass-bg: rgba(60, 50, 55, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --accent-glow: #C774E8;
+    --text-primary: #F2E8D2;
+    --text-muted: #A59EAD;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-color);
+    background-image: radial-gradient(circle at 50% 0%, #3a2e42 0%, var(--bg-color) 80%);
+    color: var(--text-primary);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* Scroll-fix (Nieuw) */
+@media (min-width: 768px) {
+    body { overflow: hidden; height: 100vh; }
+}
+@media (max-width: 767px) {
+    body { overflow-y: auto; align-items: flex-start; }
+}
+
+/* --- BENTO GRID LOGIC --- */
+.bento-grid {
+    display: grid;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 900px;
+    z-index: 10;
+    grid-template-columns: 1fr;
+}
+
+.gallery-box {
+    padding: 0 !important; /* Haalt de padding weg zodat de foto de rand raakt */
+    overflow: hidden;      /* Zorgt dat de foto binnen de ronde hoeken blijft */
+    display: flex;         /* Verwijdert witruimte onder de afbeelding */
+}
+
+@media (min-width: 768px) {
+    .bento-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-areas: 
+            "profile profile bio"
+            "profile profile status"
+            "gallery socials quotes"
+            "gallery socials extra";
+    }
+    .profile-box { grid-area: profile; }
+    .bio-box { grid-area: bio; }
+    .status-box { grid-area: status; }
+    .gallery-box { grid-area: gallery; grid-row: span 2; }
+    .socials-box { grid-area: socials; grid-row: span 2; }
+    .quotes-box { grid-area: quotes; }
+    .extra-box { grid-area: extra; }
+}
+
+/* --- GLASS STYLE --- */
+.glass {
+    background: var(--glass-bg);
+    border-radius: 32px;
+    padding: 2rem;
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+}
+
+.glass:hover {
+    transform: scale(1.02);
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 25px rgba(199, 116, 232, 0.2);
+}
+
+/* --- IMAGES & TRANSITIONS --- */
+.profile-img { 
+    height: 280px; width: 100%; border-radius: 20px; 
+    object-fit: cover; object-position: center 20%; margin-bottom: 1.5rem;
+}
+.gallery-img { 
+    height: 100%; 
+    width: 100%; 
+    object-fit: cover; 
+    border-radius: 0;      /* We gebruiken de border-radius van de box zelf nu */
+    min-height: 300px; 
+    transition: opacity 0.5s ease;
+    transform: scale(1.01); /* Een piepkleine zoom om dat witte lijntje te overlappen */
+}
+
+/* TYPOGRAPHY */
+h1 { font-size: 3rem; font-weight: 900; }
+h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.subtext { color: var(--text-muted); font-size: 0.8rem; }
+
+/* --- STATUS & FADE --- */
+#discord-status-text { transition: opacity 0.4s ease; margin-bottom: 5px; min-height: 1.2em; }
+.status-row { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+.status-indicator { width: 12px; height: 12px; border-radius: 50%; animation: pulse-glow 2s infinite; }
+
+.main-time { font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.main-time span { animation: blink 2s infinite; }
+.sub-time { font-size: 0.9rem; color: var(--accent-glow); font-weight: 700; text-transform: uppercase; }
+
+/* FADE CLASSES VOOR JS */
+.fade-out { opacity: 0; }
+.fade-in { opacity: 1; }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
+
+/* --- SOCIALS --- */
+.link-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.social-btn {
+    display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05);
+    color: var(--text-primary); text-decoration: none; padding: 12px 15px; border-radius: 18px;
+    font-weight: 700; font-size: 0.9rem; border: 1px solid var(--glass-border); transition: 0.3s;
+}
+.social-btn:hover { background: rgba(199, 116, 232, 0.15); border-color: var(--accent-glow); transform: translateX(5px); }
+
+/* --- THOUGHTS --- */
+.quote-text {
+    font-style: italic; font-size: 0.9rem; line-height: 1.4; margin-bottom: 10px;
+    transition: opacity 0.5s ease; /* NIEUW: Voor vloeiende wissel */
+}
+
+/* --- BUBBLES --- */
+.bubble-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+.bubble {
+    position: absolute; bottom: -150px; border-radius: 50%; 
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent);
+    animation: floatUp 30s infinite linear;
+}
+@keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: 0.5; } 100% { transform: translateY(-120vh); opacity: 0; } }
+.bubble:nth-child(1) { width: 200px; height: 200px; left: 5%; }
+.bubble:nth-child(2) { width: 300px; height: 300px; left: 60%; animation-delay: 5s; }
+.bubble:nth-child(3) { width: 150px; height: 150px; left: 80%; animation-delay: 12s; }
+.bubble:nth-child(4) { width: 250px; height: 250px; left: 20%; animation-delay: 18s; }
+
+.status-box.is-listening {
+    cursor: pointer;
+}
+
+.status-box.is-listening:active {
+    transform: scale(0.98); /* Kleine "klik" animatie */
+}
+/* Schakel selecteren en slepen uit voor de hele site */
+html, body {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;     /* IE 10 en Edge */
+    user-select: none;         /* Standaard (Chrome, Firefox, etc.) */
+}
+
+/* Zorg dat afbeeldingen niet gesleept kunnen worden */
+img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    pointer-events: none; /* Dit voorkomt ook dat mensen rechtsklikken om op te slaan */
+}
+
+/* OPTIONEEL: Wil je dat bepaalde tekst (zoals je Discord naam of links) WEL kopieerbaar blijft? */
+/* Voeg dan de class 'selectable' toe aan die elementen in HTML en gebruik dit: */
+.selectable {
+    -webkit-user-select: text;
+    user-select: text;
+    pointer-events: auto;
+}
