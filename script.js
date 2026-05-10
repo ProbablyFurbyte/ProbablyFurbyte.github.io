@@ -285,12 +285,19 @@ function pickTwo() {
 
 function renderTwoMessages(indices) {
     shownIndices = indices;
-    gbFeed.innerHTML = indices.map((i, slot) =>
-        `<div class="gb-message" id="gb-slot-${slot}">
-            <strong>${escapeHtml(allMessages[i].name)}</strong>
-            ${escapeHtml(allMessages[i].message)}
-        </div>`
-    ).join('');
+    gbFeed.innerHTML = indices.map((i, slot) => {
+        const msg  = allMessages[i];
+        const time = msg.created_at
+            ? new Date(msg.created_at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' })
+            : '';
+        return `<div class="gb-message" id="gb-slot-${slot}">
+            <span class="gb-meta">
+                <strong>${escapeHtml(msg.name)}</strong>
+                <span class="gb-time">${time}</span>
+            </span>
+            ${escapeHtml(msg.message)}
+        </div>`;
+    }).join('');
 }
 
 // Fade out one slot and fade in a new message
