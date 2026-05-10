@@ -320,7 +320,14 @@ function swapOneMessage() {
     slotEl.style.opacity = '0';
     setTimeout(() => {
         shownIndices[slot] = newIndex;
-        slotEl.innerHTML = `<strong>${escapeHtml(allMessages[newIndex].name)}</strong>${escapeHtml(allMessages[newIndex].message)}`;
+       const msg  = allMessages[newIndex];
+        const time = msg.created_at
+            ? new Date(msg.created_at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' })
+            : '';
+        slotEl.innerHTML = `<span class="gb-meta">
+            <strong>${escapeHtml(msg.name)}</strong>
+            <span class="gb-time">${time}</span>
+        </span>${escapeHtml(msg.message)}`;
         slotEl.style.opacity = '1';
     }, 500);
 }
