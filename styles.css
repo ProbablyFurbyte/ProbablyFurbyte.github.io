@@ -1,10 +1,10 @@
 :root {
-    --bg-color: #1E1B24;
-    --glass-bg: rgba(60, 50, 55, 0.45);
+    --bg-color:    #1E1B24;
+    --glass-bg:    rgba(60, 50, 55, 0.45);
     --glass-border: rgba(255, 255, 255, 0.08);
     --accent-glow: #C774E8;
     --text-primary: #F2E8D2;
-    --text-muted: #A59EAD;
+    --text-muted:   #A59EAD;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,7 +22,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Scroll-fix */
 @media (min-width: 768px) {
     body { overflow: hidden; height: 100vh; }
 }
@@ -30,7 +29,7 @@ body {
     body { overflow-y: auto; align-items: flex-start; }
 }
 
-/* --- BENTO GRID --- */
+/* ---- BENTO GRID ---- */
 .bento-grid {
     display: grid;
     gap: 1.5rem;
@@ -44,27 +43,29 @@ body {
     padding: 0 !important;
     overflow: hidden;
     display: flex;
+    position: relative; /* needed for credit badge */
+    cursor: pointer;
 }
 
 @media (min-width: 768px) {
     .bento-grid {
         grid-template-columns: repeat(3, 1fr);
-        grid-template-areas: 
+        grid-template-areas:
             "profile profile bio"
             "profile profile status"
             "gallery socials guestbook"
             "gallery socials extra";
     }
-    .profile-box    { grid-area: profile; }
-    .bio-box        { grid-area: bio; }
-    .status-box     { grid-area: status; }
-    .gallery-box    { grid-area: gallery; grid-row: span 2; }
-    .socials-box    { grid-area: socials; grid-row: span 2; }
-    .guestbook-box  { grid-area: guestbook; }
-    .extra-box      { grid-area: extra; }
+    .profile-box   { grid-area: profile; }
+    .bio-box       { grid-area: bio; }
+    .status-box    { grid-area: status; }
+    .gallery-box   { grid-area: gallery; grid-row: span 2; }
+    .socials-box   { grid-area: socials; grid-row: span 2; }
+    .guestbook-box { grid-area: guestbook; }
+    .extra-box     { grid-area: extra; }
 }
 
-/* --- GLASS STYLE --- */
+/* ---- GLASS ---- */
 .glass {
     background: var(--glass-bg);
     border-radius: 32px;
@@ -77,34 +78,56 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 .glass:hover {
     transform: scale(1.02);
     border-color: var(--accent-glow);
     box-shadow: 0 0 25px rgba(199, 116, 232, 0.2);
 }
 
-/* --- IMAGES & TRANSITIONS --- */
-.profile-img { 
-    height: 280px; width: 100%; border-radius: 20px; 
+/* ---- IMAGES ---- */
+.profile-img {
+    height: 280px; width: 100%; border-radius: 20px;
     object-fit: cover; object-position: center 20%; margin-bottom: 1.5rem;
 }
-.gallery-img { 
-    height: 100%; 
-    width: 100%; 
-    object-fit: cover; 
+.gallery-img {
+    height: 100%; width: 100%;
+    object-fit: cover;
     border-radius: 0;
-    min-height: 300px; 
-    transition: opacity 0.5s ease;
+    min-height: 300px;
+    transition: opacity 0.5s ease, transform 0.4s ease;
     transform: scale(1.01);
 }
+.gallery-box:hover .gallery-img {
+    transform: scale(1.04);
+}
 
-/* TYPOGRAPHY */
+/* Small photographer credit badge in bottom of gallery box */
+.gallery-credit-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(30, 27, 36, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    color: var(--text-primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+.gallery-box:hover .gallery-credit-badge {
+    opacity: 1;
+}
+
+/* ---- TYPOGRAPHY ---- */
 h1 { font-size: 3rem; font-weight: 900; }
 h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
 .subtext { color: var(--text-muted); font-size: 0.8rem; }
 
-/* --- STATUS & FADE --- */
+/* ---- STATUS ---- */
 #discord-status-text { transition: opacity 0.4s ease; margin-bottom: 5px; min-height: 1.2em; }
 .status-row { display: flex; align-items: center; gap: 10px; margin-top: auto; }
 .status-indicator { width: 12px; height: 12px; border-radius: 50%; animation: pulse-glow 2s infinite; }
@@ -113,29 +136,27 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
 .main-time span { animation: blink 2s infinite; }
 .sub-time { font-size: 0.9rem; color: var(--accent-glow); font-weight: 700; text-transform: uppercase; }
 
-/* FADE CLASSES */
 .fade-out { opacity: 0; }
 .fade-in  { opacity: 1; }
 
-@keyframes blink     { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes blink      { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
 
-/* --- SOCIALS --- */
+/* ---- SOCIALS ---- */
 .link-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 .social-btn {
-    display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05);
-    color: var(--text-primary); text-decoration: none; padding: 12px 15px; border-radius: 18px;
-    font-weight: 700; font-size: 0.9rem; border: 1px solid var(--glass-border); transition: 0.3s;
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary); text-decoration: none;
+    padding: 12px 15px; border-radius: 18px;
+    font-weight: 700; font-size: 0.9rem;
+    border: 1px solid var(--glass-border); transition: 0.3s;
 }
 .social-btn:hover { background: rgba(199, 116, 232, 0.15); border-color: var(--accent-glow); transform: translateX(5px); }
 
-/* --- GUESTBOOK --- */
-.guestbook-box {
-    /* Inherits .glass — just needs overflow for the feed scroll */
-    overflow: hidden;
-}
+/* ---- GUESTBOOK ---- */
+.guestbook-box { overflow: hidden; }
 
-/* Scrollable feed area — fits within the box */
 .gb-feed {
     flex: 1;
     overflow-y: auto;
@@ -144,7 +165,6 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     gap: 8px;
     margin-bottom: 10px;
     padding-right: 4px;
-    /* Custom scrollbar */
     scrollbar-width: thin;
     scrollbar-color: var(--accent-glow) transparent;
 }
@@ -152,7 +172,6 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
 .gb-feed::-webkit-scrollbar-track { background: transparent; }
 .gb-feed::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 4px; }
 
-/* Individual message bubble */
 .gb-message {
     background: rgba(255,255,255,0.04);
     border: 1px solid var(--glass-border);
@@ -160,6 +179,7 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     padding: 8px 12px;
     font-size: 0.78rem;
     line-height: 1.4;
+    transition: opacity 0.5s ease;
 }
 .gb-message strong {
     color: var(--accent-glow);
@@ -167,13 +187,8 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     display: block;
     margin-bottom: 2px;
 }
-.gb-empty {
-    font-size: 0.8rem;
-    text-align: center;
-    padding: 10px 0;
-}
+.gb-empty { font-size: 0.8rem; text-align: center; padding: 10px 0; }
 
-/* Form inputs */
 .gb-input {
     width: 100%;
     background: rgba(255,255,255,0.05);
@@ -187,22 +202,14 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     outline: none;
     transition: border-color 0.2s;
     margin-bottom: 6px;
-    /* Allow typing */
     -webkit-user-select: text;
     user-select: text;
     pointer-events: auto;
 }
-.gb-input:focus {
-    border-color: var(--accent-glow);
-}
-.gb-input::placeholder {
-    color: var(--text-muted);
-}
-.gb-textarea {
-    min-height: 48px;
-}
+.gb-input:focus    { border-color: var(--accent-glow); }
+.gb-input::placeholder { color: var(--text-muted); }
+.gb-textarea       { min-height: 48px; }
 
-/* Send button */
 .gb-btn {
     width: 100%;
     background: rgba(199, 116, 232, 0.15);
@@ -217,11 +224,10 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     transition: background 0.2s, transform 0.15s;
     pointer-events: auto;
 }
-.gb-btn:hover   { background: rgba(199, 116, 232, 0.3); }
-.gb-btn:active  { transform: scale(0.97); }
+.gb-btn:hover    { background: rgba(199, 116, 232, 0.3); }
+.gb-btn:active   { transform: scale(0.97); }
 .gb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Status text under button */
 .gb-status {
     margin-top: 5px;
     min-height: 1em;
@@ -229,10 +235,108 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     font-size: 0.75rem;
 }
 
-/* --- BUBBLES --- */
+/* ---- LIGHTBOX ---- */
+.lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 8, 14, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    animation: lbFadeIn 0.2s ease;
+}
+.lightbox.open { display: flex; }
+
+@keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.lightbox-card {
+    background: rgba(45, 38, 52, 0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: 28px;
+    overflow: hidden;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    position: relative;
+    animation: lbSlideUp 0.25s ease;
+}
+@keyframes lbSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.lightbox-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+    transition: background 0.2s;
+    pointer-events: auto;
+}
+.lightbox-close:hover { background: rgba(240,71,71,0.5); }
+
+.lightbox-img {
+    width: 100%;
+    max-height: 340px;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+}
+
+.lightbox-info {
+    padding: 1.2rem 1.5rem 1.5rem;
+}
+
+.lightbox-type-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+.lightbox-type-badge.vrchat { background: rgba(199,116,232,0.2); color: var(--accent-glow); border: 1px solid var(--accent-glow); }
+.lightbox-type-badge.irl    { background: rgba(67,181,129,0.2);  color: #43b581;             border: 1px solid #43b581; }
+
+.lb-photographer {
+    font-size: 1rem;
+    font-weight: 900;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+.lb-photographer::before { content: "📸 "; }
+
+.lb-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+.lb-meta-icon { font-size: 0.9rem; }
+
+.lb-notes {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ---- BUBBLES ---- */
 .bubble-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
 .bubble {
-    position: absolute; bottom: -150px; border-radius: 50%; 
+    position: absolute; bottom: -150px; border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent);
     animation: floatUp 30s infinite linear;
 }
@@ -242,23 +346,11 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
 .bubble:nth-child(3) { width: 150px; height: 150px; left: 80%; animation-delay: 12s; }
 .bubble:nth-child(4) { width: 250px; height: 250px; left: 20%; animation-delay: 18s; }
 
-/* --- SPOTIFY CLICK --- */
+/* ---- SPOTIFY ---- */
 .status-box.is-listening { cursor: pointer; }
 .status-box.is-listening:active { transform: scale(0.98); }
 
-/* --- PREVENT TEXT SELECTION & DRAG --- */
-html, body {
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-img {
-    -webkit-user-drag: none;
-    user-drag: none;
-    pointer-events: none;
-}
-.selectable {
-    -webkit-user-select: text;
-    user-select: text;
-    pointer-events: auto;
-}
+/* ---- NO SELECT / NO DRAG ---- */
+html, body { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+.selectable { -webkit-user-select: text; user-select: text; pointer-events: auto; }
