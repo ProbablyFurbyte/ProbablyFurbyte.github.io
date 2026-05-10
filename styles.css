@@ -235,6 +235,20 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
     font-size: 0.75rem;
 }
 
+.gb-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+.gb-time {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
 /* ---- LIGHTBOX ---- */
 .lightbox {
     display: none;
