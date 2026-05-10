@@ -14,6 +14,7 @@
         <div class="bubble"></div>
         <div class="bubble"></div>
     </div>
+
     <main class="bento-grid">
 
         <!-- PROFILE -->
@@ -41,9 +42,13 @@
             </div>
         </article>
 
-        <!-- GALLERY -->
+        <!-- GALLERY — clicking the image opens the lightbox -->
         <article class="bento-box gallery-box glass">
-            <img src="./assets/images/byte-camera.jpg" alt="Gallery" class="gallery-img" id="gallery-target">
+            <img src="./assets/images/byte-camera.jpg"
+                 alt="Gallery"
+                 class="gallery-img"
+                 id="gallery-target">
+            <div class="gallery-credit-badge" id="gallery-credit-badge"></div>
         </article>
 
         <!-- SOCIALS -->
@@ -51,26 +56,22 @@
             <h2>🧸 Socials</h2>
             <div class="link-buttons">
                 <a href="https://discord.com/users/416887610233847820" class="social-btn selectable"><span class="icon">💬</span> Discord</a>
-                <a href="https://x.com/ProbablyFurByte" class="social-btn selectable"><span class="icon">🐦</span> Twitter</a>
-                <a href="https://www.youtube.com/@FurByte_" class="social-btn selectable"><span class="icon">📺</span> YouTube</a>
-                <a href="https://steamcommunity.com/id/FurByte/" class="social-btn selectable"><span class="icon">🎮</span> Steam</a>
-                <a href="https://www.tiktok.com/@probablyfurbyte" class="social-btn selectable"><span class="icon">📱</span> TikTok</a>
+                <a href="https://x.com/ProbablyFurByte"               class="social-btn selectable"><span class="icon">🐦</span> Twitter</a>
+                <a href="https://www.youtube.com/@FurByte_"            class="social-btn selectable"><span class="icon">📺</span> YouTube</a>
+                <a href="https://steamcommunity.com/id/FurByte/"       class="social-btn selectable"><span class="icon">🎮</span> Steam</a>
+                <a href="https://www.tiktok.com/@probablyfurbyte"      class="social-btn selectable"><span class="icon">📱</span> TikTok</a>
             </div>
         </article>
 
-        <!-- GUESTBOOK (replaces Thoughts/Quotes) -->
+        <!-- GUESTBOOK -->
         <article class="bento-box guestbook-box glass">
             <h2>📖 Guestbook</h2>
-
-            <!-- Messages feed -->
             <div class="gb-feed" id="gb-feed">
                 <p class="gb-empty subtext">Loading messages...</p>
             </div>
-
-            <!-- Submit form -->
-            <div class="gb-form" id="gb-form">
-                <input  type="text" id="gb-name"    class="gb-input" placeholder="Your name"    maxlength="40" autocomplete="off">
-                <textarea              id="gb-message" class="gb-input gb-textarea" placeholder="Leave a message…" maxlength="200" rows="2"></textarea>
+            <div class="gb-form">
+                <input    type="text" id="gb-name"    class="gb-input"             placeholder="Your name"      maxlength="40"  autocomplete="off">
+                <textarea             id="gb-message" class="gb-input gb-textarea" placeholder="Leave a message…" maxlength="200" rows="2"></textarea>
                 <button id="gb-submit" class="gb-btn">Send ✉️</button>
                 <p id="gb-status" class="gb-status subtext"></p>
             </div>
@@ -81,12 +82,33 @@
             <h2>🌍 Local Time</h2>
             <div class="time-container">
                 <div class="main-time" id="clock-24">00:00</div>
-                <div class="sub-time" id="clock-12">00:00 AM</div>
+                <div class="sub-time"  id="clock-12">00:00 AM</div>
             </div>
             <p class="subtext">Amsterdam, NL (GMT+1)</p>
         </article>
 
     </main>
+
+    <!-- ===================== LIGHTBOX MODAL ===================== -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-card">
+            <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+            <img id="lightbox-img" src="" alt="Gallery photo" class="lightbox-img">
+            <div class="lightbox-info">
+                <div class="lightbox-type-badge" id="lb-type"></div>
+                <h3 class="lb-photographer" id="lb-photographer"></h3>
+                <div class="lb-meta-row" id="lb-world-row">
+                    <span class="lb-meta-icon">🌍</span>
+                    <span id="lb-world"></span>
+                </div>
+                <div class="lb-meta-row" id="lb-date-row">
+                    <span class="lb-meta-icon">📅</span>
+                    <span id="lb-date"></span>
+                </div>
+                <p class="lb-notes" id="lb-notes"></p>
+            </div>
+        </div>
+    </div>
 
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
