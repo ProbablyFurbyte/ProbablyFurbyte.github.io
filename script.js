@@ -1,22 +1,23 @@
 // ============================================================
-//  ⚙️  SUPABASE CONFIG  — fill in your values from the dashboard
+//  ⚙️  SUPABASE CONFIG
 //  Dashboard → Project Settings → API
 // ============================================================
-const SUPABASE_URL      = 'https://jaxkfxoymsenvklczgqd.supabase.co';       // e.g. https://xyzxyz.supabase.co
-const SUPABASE_ANON_KEY = 'sb_publishable_3o9HCY-80fMCxsUheo9dyw_wcYMnOmp';  // long "anon public" key
+const SUPABASE_URL      = 'https://jaxkfxoymsenvklczgqd.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_3o9HCY-80fMCxsUheo9dyw_wcYMnOmp';
+const BUCKET            = 'gallery_images';
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================================
-//  1.  LANYARD — Discord status + Spotify
+//  1. LANYARD — Discord status + Spotify
 // ============================================================
 const DISCORD_USER_ID = "416887610233847820";
-const LANYARD_URL = `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`;
+const LANYARD_URL     = `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`;
 
 async function updateStatus() {
     try {
         const response = await fetch(LANYARD_URL);
-        const json = await response.json();
+        const json     = await response.json();
         const dot       = document.getElementById('status-dot');
         const text      = document.getElementById('discord-status-text');
         const label     = document.getElementById('status-label');
@@ -40,12 +41,10 @@ async function updateStatus() {
                     if (data.listening_to_spotify && data.spotify) {
                         text.textContent = `Listening to ${data.spotify.song || data.spotify.track} by ${data.spotify.artist}`;
                         if (statusBox) {
-                            statusBox.style.backgroundImage = `linear-gradient(rgba(30, 27, 36, 0.9), rgba(30, 27, 36, 0.9)), url('${data.spotify.album_art_url}')`;
-                            statusBox.style.backgroundSize = 'cover';
+                            statusBox.style.backgroundImage = `linear-gradient(rgba(30,27,36,0.9), rgba(30,27,36,0.9)), url('${data.spotify.album_art_url}')`;
+                            statusBox.style.backgroundSize  = 'cover';
                             statusBox.classList.add('is-listening');
-                            statusBox.onclick = () => {
-                                window.open(`https://open.spotify.com/track/${data.spotify.track_id}`, '_blank');
-                            };
+                            statusBox.onclick = () => window.open(`https://open.spotify.com/track/${data.spotify.track_id}`, '_blank');
                         }
                     } else {
                         if (statusBox) {
@@ -64,50 +63,187 @@ async function updateStatus() {
 }
 
 // ============================================================
-//  2.  CLOCK
+//  2. CLOCK
 // ============================================================
 function updateClock() {
-    const now = new Date();
+    const now    = new Date();
     const opts24 = { timeZone: 'Europe/Amsterdam', hour12: false, hour: '2-digit', minute: '2-digit' };
     const opts12 = { timeZone: 'Europe/Amsterdam', hour12: true,  hour: '2-digit', minute: '2-digit' };
-    const time24 = new Intl.DateTimeFormat('nl-NL', opts24).format(now);
-    const time12 = new Intl.DateTimeFormat('en-US', opts12).format(now);
     const clock24 = document.getElementById('clock-24');
     const clock12 = document.getElementById('clock-12');
-    if (clock24) clock24.innerHTML = time24.replace(':', '<span>:</span>');
-    if (clock12) clock12.textContent = time12;
+    if (clock24) clock24.innerHTML = new Intl.DateTimeFormat('nl-NL', opts24).format(now).replace(':', '<span>:</span>');
+    if (clock12) clock12.textContent = new Intl.DateTimeFormat('en-US', opts12).format(now);
 }
 
 // ============================================================
-//  3.  GALLERY SLIDESHOW
+//  3. GALLERY SLIDESHOW — with metadata + lightbox
 // ============================================================
-const galleryImages = [
-    "./assets/images/byte-camera.jpg",
-    "./assets/images/byte-profile.jpg"
-];
+let galleryPhotos       = [];   // [{filename, url, photographer, taken_at, world, type, notes}]
 let currentGalleryIndex = 0;
-const galleryTarget = document.getElementById('gallery-target');
+const galleryTarget     = document.getElementById('gallery-target');
+const galleryBadge      = document.getElementById('gallery-credit-badge');
+
+// Load photo list from gallery_photos table (with metadata)
+async function loadGalleryPhotos() {
+    // Fetch metadata from the gallery_photos table
+    const { data, error } = await _supabase
+        .from('gallery_photos')
+        .select('*')
+        .order('taken_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+        // Fallback: just show the local default image with no metadata
+        galleryPhotos = [{ filename: null, url: './assets/images/byte-camera.jpg', photographer: null }];
+    } else {
+        galleryPhotos = data.map(row => {
+            const { data: urlData } = _supabase.storage.from(BUCKET).getPublicUrl(row.filename);
+            return { ...row, url: urlData.publicUrl };
+        });
+    }
+
+    // Show the first one
+    if (galleryTarget && galleryPhotos.length > 0) {
+        showGalleryPhoto(0);
+    }
+
+    // Start cycling if more than one
+    if (galleryPhotos.length > 1) {
+        setInterval(cycleGallery, 10000);
+    }
+}
+
+function showGalleryPhoto(index) {
+    if (!galleryTarget) return;
+    const photo = galleryPhotos[index];
+    galleryTarget.src = photo.url;
+
+    // Update credit badge
+    if (galleryBadge) {
+        if (photo.photographer) {
+            galleryBadge.textContent = `📸 ${photo.photographer}`;
+        } else {
+            galleryBadge.textContent = '';
+        }
+    }
+}
 
 function cycleGallery() {
-    if (!galleryTarget || galleryImages.length <= 1) return;
-    galleryTarget.classList.add('fade-out');
+    if (!galleryTarget || galleryPhotos.length <= 1) return;
+    galleryTarget.style.opacity = '0';
     setTimeout(() => {
-        currentGalleryIndex = (currentGalleryIndex + 1) % galleryImages.length;
-        galleryTarget.src = galleryImages[currentGalleryIndex];
-        galleryTarget.onload = () => galleryTarget.classList.remove('fade-out');
+        currentGalleryIndex = (currentGalleryIndex + 1) % galleryPhotos.length;
+        const photo = galleryPhotos[currentGalleryIndex];
+        galleryTarget.src = photo.url;
+        galleryTarget.onload = () => { galleryTarget.style.opacity = '1'; };
+        // Also update badge immediately
+        if (galleryBadge) {
+            galleryBadge.textContent = photo.photographer ? `📸 ${photo.photographer}` : '';
+        }
     }, 500);
 }
 
+// Lightbox
+function openLightbox(photo) {
+    const lb = document.getElementById('lightbox');
+    if (!lb) return;
+
+    document.getElementById('lightbox-img').src  = photo.url;
+    document.getElementById('lb-photographer').textContent = photo.photographer || 'Unknown photographer';
+
+    // Type badge
+    const typeBadge = document.getElementById('lb-type');
+    if (photo.type) {
+        typeBadge.textContent  = photo.type;
+        typeBadge.className    = 'lightbox-type-badge ' + (photo.type.toLowerCase().includes('vrchat') ? 'vrchat' : 'irl');
+        typeBadge.style.display = '';
+    } else {
+        typeBadge.style.display = 'none';
+    }
+
+    // World
+    const worldRow = document.getElementById('lb-world-row');
+    if (photo.world) {
+        document.getElementById('lb-world').textContent = photo.world;
+        worldRow.style.display = '';
+    } else {
+        worldRow.style.display = 'none';
+    }
+
+    // Date
+    const dateRow = document.getElementById('lb-date-row');
+    if (photo.taken_at) {
+        document.getElementById('lb-date').textContent = new Date(photo.taken_at).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+        dateRow.style.display = '';
+    } else {
+        dateRow.style.display = 'none';
+    }
+
+    // Notes
+    const notesEl = document.getElementById('lb-notes');
+    if (photo.notes) {
+        notesEl.textContent  = photo.notes;
+        notesEl.style.display = '';
+    } else {
+        notesEl.style.display = 'none';
+    }
+
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+    // If called from backdrop click, only close if they clicked the backdrop itself
+    if (e && e.target !== document.getElementById('lightbox')) return;
+    const lb = document.getElementById('lightbox');
+    if (lb) lb.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// Wire up gallery click → lightbox
+if (galleryTarget) {
+    galleryTarget.style.cursor = 'pointer';
+    galleryTarget.addEventListener('click', () => {
+        const photo = galleryPhotos[currentGalleryIndex];
+        if (photo) openLightbox(photo);
+    }, true); // capture phase so pointer-events:none on img doesn't block it
+}
+
+// Also wire the gallery-box article itself so the whole area is clickable
+const galleryBox = document.querySelector('.gallery-box');
+if (galleryBox) {
+    galleryBox.addEventListener('click', () => {
+        const photo = galleryPhotos[currentGalleryIndex];
+        if (photo) openLightbox(photo);
+    });
+}
+
+// Close on Escape key
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        const lb = document.getElementById('lightbox');
+        if (lb && lb.classList.contains('open')) {
+            lb.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    }
+});
+
 // ============================================================
-//  4.  GUESTBOOK
+//  4. GUESTBOOK — spam protection + 2-message rotation
 // ============================================================
+const GB_RATE_KEY     = 'gb_last_submit';
+const GB_COOLDOWN_MS  = 10 * 60 * 1000; // 10 minutes
+
 const gbFeed   = document.getElementById('gb-feed');
 const gbName   = document.getElementById('gb-name');
 const gbMsg    = document.getElementById('gb-message');
 const gbSubmit = document.getElementById('gb-submit');
 const gbStatus = document.getElementById('gb-status');
 
-// --- Load approved messages ---
+let allMessages    = [];  // all approved messages fetched once
+let shownIndices   = [];  // which two are currently visible
+
+// Load all approved messages, then start the rotation
 async function loadGuestbook() {
     if (!gbFeed) return;
 
@@ -115,36 +251,91 @@ async function loadGuestbook() {
         .from('guestbook')
         .select('name, message, created_at')
         .eq('is_approved', true)
-        .order('created_at', { ascending: false })
-        .limit(20);
+        .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Guestbook load error:', error);
         gbFeed.innerHTML = '<p class="gb-empty subtext">Could not load messages.</p>';
         return;
     }
 
-    if (!data || data.length === 0) {
+    allMessages = data || [];
+
+    if (allMessages.length === 0) {
         gbFeed.innerHTML = '<p class="gb-empty subtext">No messages yet — be the first! 👋</p>';
         return;
     }
 
-    gbFeed.innerHTML = data.map(entry => `
-        <div class="gb-message">
-            <strong>${escapeHtml(entry.name)}</strong>
-            ${escapeHtml(entry.message)}
-        </div>
-    `).join('');
+    // Pick two random starting messages
+    renderTwoMessages(pickTwo());
+
+    // Swap one message every 8 seconds
+    if (allMessages.length > 2) {
+        setInterval(swapOneMessage, 8000);
+    }
 }
 
-// --- Submit a new message ---
+// Pick two non-duplicate indices
+function pickTwo() {
+    if (allMessages.length === 1) return [0];
+    let a = Math.floor(Math.random() * allMessages.length);
+    let b;
+    do { b = Math.floor(Math.random() * allMessages.length); } while (b === a);
+    return [a, b];
+}
+
+function renderTwoMessages(indices) {
+    shownIndices = indices;
+    gbFeed.innerHTML = indices.map((i, slot) =>
+        `<div class="gb-message" id="gb-slot-${slot}">
+            <strong>${escapeHtml(allMessages[i].name)}</strong>
+            ${escapeHtml(allMessages[i].message)}
+        </div>`
+    ).join('');
+}
+
+// Fade out one slot and fade in a new message
+function swapOneMessage() {
+    // Pick which slot to swap (0 or 1)
+    const slot    = Math.random() < 0.5 ? 0 : 1;
+    const slotEl  = document.getElementById(`gb-slot-${slot}`);
+    if (!slotEl) return;
+
+    // Pick a new index not currently shown
+    let newIndex;
+    let attempts = 0;
+    do {
+        newIndex = Math.floor(Math.random() * allMessages.length);
+        attempts++;
+    } while (shownIndices.includes(newIndex) && attempts < 20);
+
+    if (newIndex === shownIndices[slot]) return; // nothing new to show
+
+    slotEl.style.opacity = '0';
+    setTimeout(() => {
+        shownIndices[slot] = newIndex;
+        slotEl.innerHTML = `<strong>${escapeHtml(allMessages[newIndex].name)}</strong>${escapeHtml(allMessages[newIndex].message)}`;
+        slotEl.style.opacity = '1';
+    }, 500);
+}
+
+// Submit with spam protection
 async function submitGuestbook() {
     const name    = gbName.value.trim();
     const message = gbMsg.value.trim();
 
     if (!name || !message) {
-        setGbStatus('Please fill in both fields.', false);
-        return;
+        setGbStatus('Please fill in both fields.', false); return;
+    }
+
+    // Rate limit check
+    const lastSubmit = localStorage.getItem(GB_RATE_KEY);
+    if (lastSubmit) {
+        const elapsed = Date.now() - parseInt(lastSubmit, 10);
+        if (elapsed < GB_COOLDOWN_MS) {
+            const remaining = Math.ceil((GB_COOLDOWN_MS - elapsed) / 60000);
+            setGbStatus(`Slow down! Try again in ~${remaining} min.`, false);
+            return;
+        }
     }
 
     gbSubmit.disabled = true;
@@ -155,12 +346,12 @@ async function submitGuestbook() {
         .insert([{ name, message }]);
 
     if (error) {
-        console.error('Guestbook submit error:', error);
         setGbStatus('Something went wrong. Try again!', false);
     } else {
-        gbName.value    = '';
-        gbMsg.value     = '';
-        setGbStatus('Message sent! It will appear after approval. ✨', true);
+        localStorage.setItem(GB_RATE_KEY, Date.now().toString());
+        gbName.value  = '';
+        gbMsg.value   = '';
+        setGbStatus('Sent! It will appear after approval ✨', true);
     }
 
     gbSubmit.disabled = false;
@@ -174,18 +365,17 @@ function setGbStatus(msg, success) {
                          : 'var(--text-muted)';
 }
 
-// Prevent XSS
+if (gbSubmit) gbSubmit.addEventListener('click', submitGuestbook);
+
+// ============================================================
+//  UTILS
+// ============================================================
 function escapeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
-}
-
-// Wire up submit button
-if (gbSubmit) {
-    gbSubmit.addEventListener('click', submitGuestbook);
 }
 
 // ============================================================
@@ -197,8 +387,5 @@ setInterval(updateStatus, 15000);
 updateClock();
 setInterval(updateClock, 1000);
 
-if (galleryTarget && galleryImages.length > 1) {
-    setInterval(cycleGallery, 10000);
-}
-
+loadGalleryPhotos();
 loadGuestbook();
