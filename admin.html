@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Byte</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:      #1E1B24;
+            --panel:   rgba(60, 50, 55, 0.6);
+            --border:  rgba(255,255,255,0.08);
+            --accent:  #C774E8;
+            --text:    #F2E8D2;
+            --muted:   #A59EAD;
+            --green:   #43b581;
+            --red:     #f04747;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #3a2e42 0%, var(--bg) 80%);
+            color: var(--text);
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* ---- LOGIN SCREEN ---- */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: -2rem;
+        }
+        .login-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 380px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .login-card h1 { font-size: 1.8rem; margin-bottom: 6px; }
+        .login-card p  { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+        /* ---- ADMIN PANEL ---- */
+        #admin-panel { display: none; max-width: 800px; margin: 0 auto; }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .admin-header h1 { font-size: 1.8rem; }
+        .admin-header span { color: var(--muted); font-size: 0.85rem; }
+
+        /* Tabs */
+        .tab-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+        .tab-btn {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 18px;
+            color: var(--muted);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn.active, .tab-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            background: rgba(199,116,232,0.12);
+        }
+
+        /* Card */
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            margin-bottom: 1.5rem;
+        }
+        .card h2 { font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+
+        /* Shared inputs */
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 10px;
+        }
+        input:focus { border-color: var(--accent); }
+
+        /* Buttons */
+        .btn {
+            padding: 9px 18px;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: rgba(199,116,232,0.2);
+            border-color: var(--accent);
+            color: var(--text);
+            width: 100%;
+            padding: 11px;
+        }
+        .btn-primary:hover { background: rgba(199,116,232,0.35); }
+        .btn-approve {
+            background: rgba(67,181,129,0.15);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        .btn-approve:hover { background: rgba(67,181,129,0.3); }
+        .btn-reject {
+            background: rgba(240,71,71,0.15);
+            border-color: var(--red);
+            color: var(--red);
+        }
+        .btn-reject:hover { background: rgba(240,71,71,0.3); }
+        .btn-logout {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 7px 14px;
+        }
+        .btn-logout:hover { border-color: var(--red); color: var(--red); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Status text */
+        .status-msg {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            min-height: 1em;
+            color: var(--muted);
+        }
+        .status-msg.ok  { color: var(--green); }
+        .status-msg.err { color: var(--red); }
+
+        /* Guestbook entries */
+        .entry-list { display: flex; flex-direction: column; gap: 10px; }
+        .entry {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .entry-content { flex: 1; }
+        .entry-name    { color: var(--accent); font-weight: 700; font-size: 0.8rem; margin-bottom: 3px; }
+        .entry-text    { font-size: 0.82rem; line-height: 1.4; }
+        .entry-date    { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+        .entry-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+        .empty-msg { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 1rem 0; }
+
+        /* Gallery upload area */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            margin-bottom: 12px;
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--accent);
+            background: rgba(199,116,232,0.06);
+        }
+        .drop-zone p       { color: var(--muted); font-size: 0.85rem; }
+        .drop-zone .icon   { font-size: 2rem; margin-bottom: 8px; }
+        #file-input        { display: none; }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .gallery-thumb {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+        .gallery-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+        .gallery-thumb .delete-btn {
+            position: absolute;
+            top: 4px; right: 4px;
+            background: rgba(240,71,71,0.8);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .gallery-thumb:hover .delete-btn { opacity: 1; }
+
+        /* Progress bar */
+        .progress-bar-wrap {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            display: none;
+            margin-top: 6px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.2s;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h1>🔒 Admin</h1>
+            <p>Byte's secret control room</p>
+            <input type="email"    id="login-email"    placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Log in</button>
+            <p class="status-msg" id="login-status"></p>
+        </div>
+    </div>
+
+    <!-- ==================== ADMIN PANEL ==================== -->
+    <div id="admin-panel">
+        <div class="admin-header">
+            <div>
+                <h1>⚙️ Admin Panel</h1>
+                <span id="admin-email-label"></span>
+            </div>
+            <button class="btn btn-logout" onclick="doLogout()">Log out</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tab-guestbook" onclick="switchTab('guestbook')">📖 Guestbook</button>
+            <button class="tab-btn"        id="tab-gallery"   onclick="switchTab('gallery')">🖼️ Gallery</button>
+        </div>
+
+        <!-- -------- GUESTBOOK TAB -------- -->
+        <div id="section-guestbook">
+            <div class="card">
+                <h2>⏳ Pending approval</h2>
+                <div class="entry-list" id="pending-list">
+                    <p class="empty-msg">Loading…</p>
+                </div>
+            </div>
+            <div class="card">
+                <h2>✅ Approved messages</h2>
+                <div class="entry-list" id="approved-list">
+                    <p class="empty-msg">Loading…</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- -------- GALLERY TAB -------- -->
+        <div id="section-gallery" style="display:none">
+            <div class="card">
+                <h2>📤 Upload image</h2>
+                <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <div class="icon">📁</div>
+                    <p>Click or drag & drop an image here</p>
+                    <p style="font-size:0.75rem;margin-top:4px;">PNG, JPG, WEBP — max 5 MB</p>
+                </div>
+                <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" onchange="handleFileSelect(this.files)">
+                <div class="progress-bar-wrap" id="progress-wrap">
+                    <div class="progress-bar-fill" id="progress-bar"></div>
+                </div>
+                <p class="status-msg" id="upload-status"></p>
+            </div>
+            <div class="card">
+                <h2>🗂️ Uploaded images</h2>
+                <div class="gallery-grid" id="gallery-grid">
+                    <p class="empty-msg" style="grid-column:1/-1">Loading…</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    // ============================================================
+    //  ⚙️  CONFIG — same values as script.js
+    // ============================================================
+    const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const BUCKET            = 'gallery_images';
+
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ============================================================
+    //  AUTH
+    // ============================================================
+    async function checkSession() {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session) showPanel(session.user.email);
+    }
+
+    async function doLogin() {
+        const email    = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const btn      = document.getElementById('login-btn');
+        const status   = document.getElementById('login-status');
+
+        btn.disabled = true;
+        status.textContent = 'Logging in…';
+        status.className   = 'status-msg';
+
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            status.textContent = error.message;
+            status.className   = 'status-msg err';
+            btn.disabled = false;
+            return;
+        }
+        showPanel(data.user.email);
+    }
+
+    async function doLogout() {
+        await _supabase.auth.signOut();
+        document.getElementById('admin-panel').style.display   = 'none';
+        document.getElementById('login-screen').style.display  = 'flex';
+        document.getElementById('login-password').value        = '';
+        document.getElementById('login-status').textContent    = '';
+    }
+
+    function showPanel(email) {
+        document.getElementById('login-screen').style.display  = 'none';
+        document.getElementById('admin-panel').style.display   = 'block';
+        document.getElementById('admin-email-label').textContent = `Logged in as ${email}`;
+        loadGuestbook();
+        loadGallery();
+    }
+
+    // ============================================================
+    //  TABS
+    // ============================================================
+    function switchTab(tab) {
+        document.getElementById('section-guestbook').style.display = tab === 'guestbook' ? 'block' : 'none';
+        document.getElementById('section-gallery').style.display   = tab === 'gallery'   ? 'block' : 'none';
+        document.getElementById('tab-guestbook').className = 'tab-btn' + (tab === 'guestbook' ? ' active' : '');
+        document.getElementById('tab-gallery').className   = 'tab-btn' + (tab === 'gallery'   ? ' active' : '');
+    }
+
+    // ============================================================
+    //  GUESTBOOK MODERATION
+    // ============================================================
+    async function loadGuestbook() {
+        const { data, error } = await _supabase
+            .from('guestbook')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) { console.error(error); return; }
+
+        const pending  = data.filter(e => !e.is_approved);
+        const approved = data.filter(e =>  e.is_approved);
+
+        renderEntries('pending-list',  pending,  true);
+        renderEntries('approved-list', approved, false);
+    }
+
+    function renderEntries(containerId, entries, isPending) {
+        const el = document.getElementById(containerId);
+        if (!entries.length) {
+            el.innerHTML = `<p class="empty-msg">${isPending ? 'Nothing pending 🎉' : 'No approved messages yet.'}</p>`;
+            return;
+        }
+        el.innerHTML = entries.map(e => `
+            <div class="entry" id="entry-${e.id}">
+                <div class="entry-content">
+                    <div class="entry-name">${escapeHtml(e.name)}</div>
+                    <div class="entry-text">${escapeHtml(e.message)}</div>
+                    <div class="entry-date">${new Date(e.created_at).toLocaleString('en-GB')}</div>
+                </div>
+                <div class="entry-actions">
+                    ${isPending
+                        ? `<button class="btn btn-approve" onclick="approveEntry(${e.id})">✅ Approve</button>`
+                        : `<button class="btn btn-reject"  onclick="deleteEntry(${e.id})">🗑️ Delete</button>`
+                    }
+                    <button class="btn btn-reject" onclick="deleteEntry(${e.id})">✖ Reject</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function approveEntry(id) {
+        const { error } = await _supabase
+            .from('guestbook')
+            .update({ is_approved: true })
+            .eq('id', id);
+        if (error) { alert('Error: ' + error.message); return; }
+        loadGuestbook();
+    }
+
+    async function deleteEntry(id) {
+        if (!confirm('Delete this entry permanently?')) return;
+        const { error } = await _supabase
+            .from('guestbook')
+            .delete()
+            .eq('id', id);
+        if (error) { alert('Error: ' + error.message); return; }
+        loadGuestbook();
+    }
+
+    // ============================================================
+    //  GALLERY
+    // ============================================================
+    async function loadGallery() {
+        const grid = document.getElementById('gallery-grid');
+        const { data, error } = await _supabase.storage.from(BUCKET).list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+        if (error) { grid.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">Could not load images.</p>'; return; }
+        if (!data || data.length === 0) { grid.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">No images uploaded yet.</p>'; return; }
+
+        // Filter out .emptyFolderPlaceholder
+        const files = data.filter(f => f.name !== '.emptyFolderPlaceholder');
+
+        grid.innerHTML = files.map(file => {
+            const { data: urlData } = _supabase.storage.from(BUCKET).getPublicUrl(file.name);
+            return `
+                <div class="gallery-thumb" id="thumb-${file.name.replace(/\./g, '_')}">
+                    <img src="${urlData.publicUrl}" alt="${file.name}" loading="lazy">
+                    <button class="delete-btn" onclick="deleteImage('${file.name}')">✖</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function deleteImage(filename) {
+        if (!confirm(`Delete "${filename}"?`)) return;
+        const { error } = await _supabase.storage.from(BUCKET).remove([filename]);
+        if (error) { alert('Error: ' + error.message); return; }
+        loadGallery();
+    }
+
+    // --- Upload ---
+    const dropZone = document.getElementById('drop-zone');
+
+    dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', e => { dropZone.classList.remove('drag-over'); });
+    dropZone.addEventListener('drop',      e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        handleFileSelect(e.dataTransfer.files);
+    });
+
+    async function handleFileSelect(files) {
+        if (!files || files.length === 0) return;
+        const file   = files[0];
+        const status = document.getElementById('upload-status');
+        const progWrap = document.getElementById('progress-wrap');
+        const progBar  = document.getElementById('progress-bar');
+
+        // Validate
+        const allowed = ['image/png','image/jpeg','image/webp'];
+        if (!allowed.includes(file.type)) {
+            setUploadStatus('Only PNG, JPG, or WEBP please.', 'err'); return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            setUploadStatus('File too large (max 5 MB).', 'err'); return;
+        }
+
+        // Unique filename
+        const ext      = file.name.split('.').pop();
+        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+        progWrap.style.display = 'block';
+        progBar.style.width    = '0%';
+        setUploadStatus('Uploading…', '');
+
+        // Supabase storage upload
+        const { error } = await _supabase.storage
+            .from(BUCKET)
+            .upload(filename, file, { cacheControl: '3600', upsert: false });
+
+        progBar.style.width = '100%';
+
+        if (error) {
+            setUploadStatus('Upload failed: ' + error.message, 'err');
+        } else {
+            setUploadStatus(`✅ Uploaded as "${filename}"`, 'ok');
+            loadGallery();
+        }
+        setTimeout(() => { progWrap.style.display = 'none'; progBar.style.width = '0%'; }, 1500);
+    }
+
+    function setUploadStatus(msg, cls) {
+        const el = document.getElementById('upload-status');
+        el.textContent = msg;
+        el.className   = 'status-msg' + (cls ? ' ' + cls : '');
+    }
+
+    // ============================================================
+    //  UTILS
+    // ============================================================
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // ============================================================
+    //  BOOT
+    // ============================================================
+    checkSession();
+    </script>
+</body>
+</html>
