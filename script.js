@@ -320,7 +320,7 @@ function swapOneMessage() {
     slotEl.style.opacity = '0';
     setTimeout(() => {
         shownIndices[slot] = newIndex;
-       const msg  = allMessages[newIndex];
+const msg  = allMessages[newIndex];
         const time = msg.created_at
             ? new Date(msg.created_at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' })
             : '';
