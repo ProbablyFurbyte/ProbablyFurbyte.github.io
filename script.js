@@ -3,8 +3,8 @@ const LANYARD_URL = `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`;
 
 // --- SUPABASE SETUP ---
 // !!! REPLACE THESE WITH YOUR EXACT URL AND PUBLISHABLE KEY !!!
-const SUPABASE_URL = 'YOUR_URL_HERE'; 
-const SUPABASE_KEY = 'YOUR_PUBLISHABLE_KEY_HERE';
+const SUPABASE_URL = 'https://jaxkfxoymsenvklczgqd.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_3o9HCY-80fMCxsUheo9dyw_wcYMnOmp';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // --- 1. LANYARD STATUS & KLOK ---
