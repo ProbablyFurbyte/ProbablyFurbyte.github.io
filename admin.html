@@ -7,14 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:      #1E1B24;
-            --panel:   rgba(60, 50, 55, 0.6);
-            --border:  rgba(255,255,255,0.08);
-            --accent:  #C774E8;
-            --text:    #F2E8D2;
-            --muted:   #A59EAD;
-            --green:   #43b581;
-            --red:     #f04747;
+            --bg:     #1E1B24;
+            --panel:  rgba(60, 50, 55, 0.6);
+            --border: rgba(255,255,255,0.08);
+            --accent: #C774E8;
+            --text:   #F2E8D2;
+            --muted:  #A59EAD;
+            --green:  #43b581;
+            --red:    #f04747;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -26,21 +26,17 @@
             padding: 2rem;
         }
 
-        /* ---- LOGIN SCREEN ---- */
+        /* ---- LOGIN ---- */
         #login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: -2rem;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: -2rem;
         }
         .login-card {
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 28px;
             padding: 2.5rem;
-            width: 100%;
-            max-width: 380px;
+            width: 100%; max-width: 380px;
             backdrop-filter: blur(20px);
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
@@ -48,11 +44,9 @@
         .login-card p  { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
 
         /* ---- ADMIN PANEL ---- */
-        #admin-panel { display: none; max-width: 800px; margin: 0 auto; }
+        #admin-panel { display: none; max-width: 820px; margin: 0 auto; }
         .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 2rem;
         }
         .admin-header h1 { font-size: 1.8rem; }
@@ -61,38 +55,27 @@
         /* Tabs */
         .tab-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; }
         .tab-btn {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 8px 18px;
-            color: var(--muted);
-            font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px 18px;
+            color: var(--muted); font-family: 'Nunito', sans-serif;
+            font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
         }
         .tab-btn.active, .tab-btn:hover {
-            border-color: var(--accent);
-            color: var(--text);
+            border-color: var(--accent); color: var(--text);
             background: rgba(199,116,232,0.12);
         }
 
         /* Card */
         .card {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 1.5rem;
-            backdrop-filter: blur(20px);
-            margin-bottom: 1.5rem;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 24px; padding: 1.5rem;
+            backdrop-filter: blur(20px); margin-bottom: 1.5rem;
         }
         .card h2 { font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
 
-        /* Shared inputs */
-        input[type="email"],
-        input[type="password"],
-        input[type="text"] {
+        /* Inputs */
+        input[type="email"], input[type="password"], input[type="text"],
+        input[type="date"], select, textarea {
             width: 100%;
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--border);
@@ -105,157 +88,137 @@
             transition: border-color 0.2s;
             margin-bottom: 10px;
         }
-        input:focus { border-color: var(--accent); }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        select option { background: #2a2235; }
+        textarea { resize: vertical; min-height: 70px; }
+
+        /* Two-column input row */
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 500px) { .input-row { grid-template-columns: 1fr; } }
 
         /* Buttons */
         .btn {
-            padding: 9px 18px;
-            border-radius: 12px;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: 0.2s;
+            padding: 9px 18px; border-radius: 12px;
+            font-family: 'Nunito', sans-serif; font-weight: 700;
+            font-size: 0.85rem; cursor: pointer; border: 1px solid transparent; transition: 0.2s;
         }
         .btn-primary {
-            background: rgba(199,116,232,0.2);
-            border-color: var(--accent);
-            color: var(--text);
-            width: 100%;
-            padding: 11px;
+            background: rgba(199,116,232,0.2); border-color: var(--accent);
+            color: var(--text); width: 100%; padding: 11px;
         }
         .btn-primary:hover { background: rgba(199,116,232,0.35); }
-        .btn-approve {
-            background: rgba(67,181,129,0.15);
-            border-color: var(--green);
-            color: var(--green);
-        }
+        .btn-approve { background: rgba(67,181,129,0.15); border-color: var(--green); color: var(--green); }
         .btn-approve:hover { background: rgba(67,181,129,0.3); }
-        .btn-reject {
-            background: rgba(240,71,71,0.15);
-            border-color: var(--red);
-            color: var(--red);
-        }
-        .btn-reject:hover { background: rgba(240,71,71,0.3); }
-        .btn-logout {
-            background: transparent;
-            border-color: var(--border);
-            color: var(--muted);
-            font-size: 0.8rem;
-            padding: 7px 14px;
-        }
-        .btn-logout:hover { border-color: var(--red); color: var(--red); }
+        .btn-reject  { background: rgba(240,71,71,0.15);  border-color: var(--red);   color: var(--red); }
+        .btn-reject:hover  { background: rgba(240,71,71,0.3); }
+        .btn-logout  { background: transparent; border-color: var(--border); color: var(--muted); font-size: 0.8rem; padding: 7px 14px; }
+        .btn-logout:hover  { border-color: var(--red); color: var(--red); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Status text */
-        .status-msg {
-            font-size: 0.8rem;
-            margin-top: 8px;
-            min-height: 1em;
-            color: var(--muted);
-        }
+        /* Status */
+        .status-msg { font-size: 0.8rem; margin-top: 8px; min-height: 1em; color: var(--muted); }
         .status-msg.ok  { color: var(--green); }
         .status-msg.err { color: var(--red); }
 
         /* Guestbook entries */
         .entry-list { display: flex; flex-direction: column; gap: 10px; }
         .entry {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 14px; padding: 12px 14px;
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
         }
         .entry-content { flex: 1; }
-        .entry-name    { color: var(--accent); font-weight: 700; font-size: 0.8rem; margin-bottom: 3px; }
-        .entry-text    { font-size: 0.82rem; line-height: 1.4; }
-        .entry-date    { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
-        .entry-actions { display: flex; gap: 6px; flex-shrink: 0; }
-
+        .entry-name { color: var(--accent); font-weight: 700; font-size: 0.8rem; margin-bottom: 3px; }
+        .entry-text { font-size: 0.82rem; line-height: 1.4; }
+        .entry-date { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+        .entry-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
         .empty-msg { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 1rem 0; }
 
-        /* Gallery upload area */
+        /* Drop zone */
         .drop-zone {
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
-            margin-bottom: 12px;
+            border: 2px dashed var(--border); border-radius: 16px;
+            padding: 2rem; text-align: center; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s; margin-bottom: 12px;
         }
         .drop-zone:hover, .drop-zone.drag-over {
-            border-color: var(--accent);
-            background: rgba(199,116,232,0.06);
+            border-color: var(--accent); background: rgba(199,116,232,0.06);
         }
-        .drop-zone p       { color: var(--muted); font-size: 0.85rem; }
-        .drop-zone .icon   { font-size: 2rem; margin-bottom: 8px; }
-        #file-input        { display: none; }
+        .drop-zone p     { color: var(--muted); font-size: 0.85rem; }
+        .drop-zone .icon { font-size: 2rem; margin-bottom: 8px; }
+        #file-input { display: none; }
 
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .gallery-thumb {
-            position: relative;
-            border-radius: 10px;
+        /* Image preview in upload section */
+        .upload-preview {
+            display: none;
+            border-radius: 14px;
             overflow: hidden;
-            aspect-ratio: 1;
+            margin-bottom: 12px;
+            position: relative;
         }
-        .gallery-thumb img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            pointer-events: none;
+        .upload-preview img {
+            width: 100%; max-height: 220px;
+            object-fit: cover; display: block;
         }
-        .gallery-thumb .delete-btn {
-            position: absolute;
-            top: 4px; right: 4px;
-            background: rgba(240,71,71,0.8);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
+        .upload-preview .preview-size {
+            position: absolute; bottom: 8px; right: 8px;
+            background: rgba(0,0,0,0.6); border-radius: 8px;
+            padding: 2px 8px; font-size: 0.7rem; color: var(--muted);
         }
-        .gallery-thumb:hover .delete-btn { opacity: 1; }
+
+        /* Metadata form — hidden until file selected */
+        #meta-form { display: none; }
+        #meta-form label {
+            display: block; font-size: 0.75rem; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .field-group { margin-bottom: 2px; }
 
         /* Progress bar */
-        .progress-bar-wrap {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            height: 6px;
-            overflow: hidden;
-            display: none;
-            margin-top: 6px;
+        .progress-wrap { background: rgba(255,255,255,0.05); border-radius: 8px; height: 6px; overflow: hidden; display: none; margin-top: 6px; }
+        .progress-fill { height: 100%; background: var(--accent); transition: width 0.3s; width: 0%; }
+
+        /* Gallery grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px; margin-top: 12px;
         }
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--accent);
-            transition: width 0.2s;
-            width: 0%;
+        .gallery-thumb {
+            position: relative; border-radius: 10px;
+            overflow: hidden; aspect-ratio: 1; cursor: pointer;
         }
+        .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .gallery-thumb .thumb-overlay {
+            position: absolute; inset: 0;
+            background: rgba(10,8,14,0.7);
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 6px 8px;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .gallery-thumb:hover .thumb-overlay { opacity: 1; }
+        .thumb-credit { font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+        .thumb-type   { font-size: 0.6rem; color: var(--muted); margin-bottom: 4px; }
+        .thumb-delete {
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(240,71,71,0.85); border: none;
+            border-radius: 6px; color: white;
+            font-size: 0.65rem; padding: 2px 6px;
+            cursor: pointer; opacity: 0; transition: opacity 0.2s;
+        }
+        .gallery-thumb:hover .thumb-delete { opacity: 1; }
     </style>
 </head>
 <body>
 
-    <!-- ==================== LOGIN SCREEN ==================== -->
+    <!-- ==================== LOGIN ==================== -->
     <div id="login-screen">
         <div class="login-card">
             <h1>🔒 Admin</h1>
             <p>Byte's secret control room</p>
             <input type="email"    id="login-email"    placeholder="Email">
             <input type="password" id="login-password" placeholder="Password">
-            <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Log in</button>
+            <button class="btn btn-primary" onclick="doLogin()">Log in</button>
             <p class="status-msg" id="login-status"></p>
         </div>
     </div>
@@ -270,58 +233,96 @@
             <button class="btn btn-logout" onclick="doLogout()">Log out</button>
         </div>
 
-        <!-- Tabs -->
         <div class="tab-bar">
             <button class="tab-btn active" id="tab-guestbook" onclick="switchTab('guestbook')">📖 Guestbook</button>
             <button class="tab-btn"        id="tab-gallery"   onclick="switchTab('gallery')">🖼️ Gallery</button>
         </div>
 
-        <!-- -------- GUESTBOOK TAB -------- -->
+        <!-- -------- GUESTBOOK -------- -->
         <div id="section-guestbook">
             <div class="card">
                 <h2>⏳ Pending approval</h2>
-                <div class="entry-list" id="pending-list">
-                    <p class="empty-msg">Loading…</p>
-                </div>
+                <div class="entry-list" id="pending-list"><p class="empty-msg">Loading…</p></div>
             </div>
             <div class="card">
                 <h2>✅ Approved messages</h2>
-                <div class="entry-list" id="approved-list">
-                    <p class="empty-msg">Loading…</p>
-                </div>
+                <div class="entry-list" id="approved-list"><p class="empty-msg">Loading…</p></div>
             </div>
         </div>
 
-        <!-- -------- GALLERY TAB -------- -->
+        <!-- -------- GALLERY -------- -->
         <div id="section-gallery" style="display:none">
             <div class="card">
-                <h2>📤 Upload image</h2>
+                <h2>📤 Upload new photo</h2>
+
+                <!-- Drop zone -->
                 <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
                     <div class="icon">📁</div>
                     <p>Click or drag & drop an image here</p>
-                    <p style="font-size:0.75rem;margin-top:4px;">PNG, JPG, WEBP — max 5 MB</p>
+                    <p style="font-size:0.75rem;margin-top:4px;">PNG, JPG, WEBP — up to 50 MB — auto-compressed to ≤ 2 MB</p>
                 </div>
                 <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" onchange="handleFileSelect(this.files)">
-                <div class="progress-bar-wrap" id="progress-wrap">
-                    <div class="progress-bar-fill" id="progress-bar"></div>
+
+                <!-- Preview -->
+                <div class="upload-preview" id="upload-preview">
+                    <img id="preview-img" src="" alt="Preview">
+                    <span class="preview-size" id="preview-size"></span>
                 </div>
-                <p class="status-msg" id="upload-status"></p>
+
+                <!-- Metadata form — shown after file chosen -->
+                <div id="meta-form">
+                    <div class="input-row">
+                        <div class="field-group">
+                            <label>📸 Photographer *</label>
+                            <input type="text" id="meta-photographer" placeholder="Their name / username" maxlength="80">
+                        </div>
+                        <div class="field-group">
+                            <label>📅 Date taken</label>
+                            <input type="date" id="meta-date">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="field-group">
+                            <label>🌍 World / Location</label>
+                            <input type="text" id="meta-world" placeholder="e.g. The Black Cat, IRL Amsterdam" maxlength="100">
+                        </div>
+                        <div class="field-group">
+                            <label>🏷️ Type</label>
+                            <select id="meta-type">
+                                <option value="">— select —</option>
+                                <option value="VRChat">VRChat</option>
+                                <option value="IRL">IRL</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>📝 Notes (optional)</label>
+                        <textarea id="meta-notes" placeholder="Anything extra to show visitors…" maxlength="300"></textarea>
+                    </div>
+
+                    <div class="progress-wrap" id="progress-wrap">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+
+                    <button class="btn btn-primary" id="upload-btn" onclick="doUpload()">⬆️ Upload & Save</button>
+                    <p class="status-msg" id="upload-status"></p>
+                </div>
             </div>
+
             <div class="card">
-                <h2>🗂️ Uploaded images</h2>
+                <h2>🗂️ Uploaded photos</h2>
                 <div class="gallery-grid" id="gallery-grid">
                     <p class="empty-msg" style="grid-column:1/-1">Loading…</p>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
     // ============================================================
-    //  ⚙️  CONFIG — same values as script.js
+    //  CONFIG — same values as script.js
     // ============================================================
     const SUPABASE_URL      = 'https://jaxkfxoymsenvklczgqd.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_3o9HCY-80fMCxsUheo9dyw_wcYMnOmp';
@@ -340,35 +341,26 @@
     async function doLogin() {
         const email    = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value;
-        const btn      = document.getElementById('login-btn');
         const status   = document.getElementById('login-status');
-
-        btn.disabled = true;
-        status.textContent = 'Logging in…';
-        status.className   = 'status-msg';
+        status.textContent = 'Logging in…'; status.className = 'status-msg';
 
         const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-
         if (error) {
-            status.textContent = error.message;
-            status.className   = 'status-msg err';
-            btn.disabled = false;
-            return;
+            status.textContent = error.message; status.className = 'status-msg err'; return;
         }
         showPanel(data.user.email);
     }
 
     async function doLogout() {
         await _supabase.auth.signOut();
-        document.getElementById('admin-panel').style.display   = 'none';
-        document.getElementById('login-screen').style.display  = 'flex';
-        document.getElementById('login-password').value        = '';
-        document.getElementById('login-status').textContent    = '';
+        document.getElementById('admin-panel').style.display  = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('login-password').value       = '';
     }
 
     function showPanel(email) {
-        document.getElementById('login-screen').style.display  = 'none';
-        document.getElementById('admin-panel').style.display   = 'block';
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display  = 'block';
         document.getElementById('admin-email-label').textContent = `Logged in as ${email}`;
         loadGuestbook();
         loadGallery();
@@ -385,146 +377,207 @@
     }
 
     // ============================================================
-    //  GUESTBOOK MODERATION
+    //  GUESTBOOK
     // ============================================================
     async function loadGuestbook() {
-        const { data, error } = await _supabase
-            .from('guestbook')
-            .select('*')
-            .order('created_at', { ascending: false });
-
+        const { data, error } = await _supabase.from('guestbook').select('*').order('created_at', { ascending: false });
         if (error) { console.error(error); return; }
-
-        const pending  = data.filter(e => !e.is_approved);
-        const approved = data.filter(e =>  e.is_approved);
-
-        renderEntries('pending-list',  pending,  true);
-        renderEntries('approved-list', approved, false);
+        renderEntries('pending-list',  data.filter(e => !e.is_approved), true);
+        renderEntries('approved-list', data.filter(e =>  e.is_approved), false);
     }
 
-    function renderEntries(containerId, entries, isPending) {
-        const el = document.getElementById(containerId);
+    function renderEntries(id, entries, isPending) {
+        const el = document.getElementById(id);
         if (!entries.length) {
-            el.innerHTML = `<p class="empty-msg">${isPending ? 'Nothing pending 🎉' : 'No approved messages yet.'}</p>`;
-            return;
+            el.innerHTML = `<p class="empty-msg">${isPending ? 'Nothing pending 🎉' : 'No approved messages yet.'}</p>`; return;
         }
         el.innerHTML = entries.map(e => `
             <div class="entry" id="entry-${e.id}">
                 <div class="entry-content">
-                    <div class="entry-name">${escapeHtml(e.name)}</div>
-                    <div class="entry-text">${escapeHtml(e.message)}</div>
+                    <div class="entry-name">${esc(e.name)}</div>
+                    <div class="entry-text">${esc(e.message)}</div>
                     <div class="entry-date">${new Date(e.created_at).toLocaleString('en-GB')}</div>
                 </div>
                 <div class="entry-actions">
-                    ${isPending
-                        ? `<button class="btn btn-approve" onclick="approveEntry(${e.id})">✅ Approve</button>`
-                        : `<button class="btn btn-reject"  onclick="deleteEntry(${e.id})">🗑️ Delete</button>`
-                    }
-                    <button class="btn btn-reject" onclick="deleteEntry(${e.id})">✖ Reject</button>
+                    ${isPending ? `<button class="btn btn-approve" onclick="approveEntry(${e.id})">✅ Approve</button>` : ''}
+                    <button class="btn btn-reject" onclick="deleteEntry(${e.id})">🗑️ Delete</button>
                 </div>
             </div>
         `).join('');
     }
 
     async function approveEntry(id) {
-        const { error } = await _supabase
-            .from('guestbook')
-            .update({ is_approved: true })
-            .eq('id', id);
-        if (error) { alert('Error: ' + error.message); return; }
+        const { error } = await _supabase.from('guestbook').update({ is_approved: true }).eq('id', id);
+        if (error) { alert(error.message); return; }
         loadGuestbook();
     }
 
     async function deleteEntry(id) {
-        if (!confirm('Delete this entry permanently?')) return;
-        const { error } = await _supabase
-            .from('guestbook')
-            .delete()
-            .eq('id', id);
-        if (error) { alert('Error: ' + error.message); return; }
+        if (!confirm('Delete permanently?')) return;
+        const { error } = await _supabase.from('guestbook').delete().eq('id', id);
+        if (error) { alert(error.message); return; }
         loadGuestbook();
     }
 
     // ============================================================
-    //  GALLERY
+    //  GALLERY — UPLOAD WITH COMPRESSION
     // ============================================================
-    async function loadGallery() {
-        const grid = document.getElementById('gallery-grid');
-        const { data, error } = await _supabase.storage.from(BUCKET).list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+    let pendingFile     = null;  // the compressed Blob
+    let pendingFilename = null;
 
-        if (error) { grid.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">Could not load images.</p>'; return; }
-        if (!data || data.length === 0) { grid.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">No images uploaded yet.</p>'; return; }
-
-        // Filter out .emptyFolderPlaceholder
-        const files = data.filter(f => f.name !== '.emptyFolderPlaceholder');
-
-        grid.innerHTML = files.map(file => {
-            const { data: urlData } = _supabase.storage.from(BUCKET).getPublicUrl(file.name);
-            return `
-                <div class="gallery-thumb" id="thumb-${file.name.replace(/\./g, '_')}">
-                    <img src="${urlData.publicUrl}" alt="${file.name}" loading="lazy">
-                    <button class="delete-btn" onclick="deleteImage('${file.name}')">✖</button>
-                </div>
-            `;
-        }).join('');
-    }
-
-    async function deleteImage(filename) {
-        if (!confirm(`Delete "${filename}"?`)) return;
-        const { error } = await _supabase.storage.from(BUCKET).remove([filename]);
-        if (error) { alert('Error: ' + error.message); return; }
-        loadGallery();
-    }
-
-    // --- Upload ---
     const dropZone = document.getElementById('drop-zone');
-
     dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', e => { dropZone.classList.remove('drag-over'); });
-    dropZone.addEventListener('drop',      e => {
-        e.preventDefault();
-        dropZone.classList.remove('drag-over');
-        handleFileSelect(e.dataTransfer.files);
-    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop',      e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFileSelect(e.dataTransfer.files); });
 
     async function handleFileSelect(files) {
         if (!files || files.length === 0) return;
-        const file   = files[0];
-        const status = document.getElementById('upload-status');
-        const progWrap = document.getElementById('progress-wrap');
-        const progBar  = document.getElementById('progress-bar');
-
-        // Validate
+        const file = files[0];
         const allowed = ['image/png','image/jpeg','image/webp'];
-        if (!allowed.includes(file.type)) {
-            setUploadStatus('Only PNG, JPG, or WEBP please.', 'err'); return;
+        if (!allowed.includes(file.type)) { setUploadStatus('Only PNG, JPG, or WEBP please.', 'err'); return; }
+        if (file.size > 50 * 1024 * 1024)  { setUploadStatus('File too large (max 50 MB).', 'err'); return; }
+
+        setUploadStatus('Compressing image…', '');
+
+        try {
+            const compressed = await compressImage(file, 2);  // target ≤ 2 MB
+            pendingFile = compressed;
+
+            // Build filename
+            const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+            pendingFilename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+            // Show preview
+            const previewWrap = document.getElementById('upload-preview');
+            const previewImg  = document.getElementById('preview-img');
+            const sizeLabel   = document.getElementById('preview-size');
+            previewImg.src    = URL.createObjectURL(compressed);
+            sizeLabel.textContent = `${(compressed.size / 1024 / 1024).toFixed(2)} MB (compressed)`;
+            previewWrap.style.display = 'block';
+
+            // Show metadata form
+            document.getElementById('meta-form').style.display = 'block';
+
+            const origMB = (file.size / 1024 / 1024).toFixed(2);
+            const compMB = (compressed.size / 1024 / 1024).toFixed(2);
+            setUploadStatus(`Compressed from ${origMB} MB → ${compMB} MB. Fill in the details below.`, 'ok');
+        } catch (err) {
+            setUploadStatus('Compression failed: ' + err.message, 'err');
         }
-        if (file.size > 5 * 1024 * 1024) {
-            setUploadStatus('File too large (max 5 MB).', 'err'); return;
+    }
+
+    // Canvas-based image compression
+    // Tries to get under targetMB by reducing quality / scaling down
+    function compressImage(file, targetMB) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const canvas = document.createElement('canvas');
+
+                // Start at original size, scale down if too big
+                let w = img.width;
+                let h = img.height;
+                const MAX_DIM = 3000; // cap longest side at 3000px
+                if (w > MAX_DIM || h > MAX_DIM) {
+                    const scale = MAX_DIM / Math.max(w, h);
+                    w = Math.round(w * scale);
+                    h = Math.round(h * scale);
+                }
+                canvas.width  = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+
+                // Try reducing quality in steps until we're under targetMB
+                const targetBytes = targetMB * 1024 * 1024;
+                const mimeType = file.type === 'image/png' ? 'image/jpeg' : file.type; // PNGs compress poorly, convert to JPEG
+
+                let quality = 0.92;
+                const attempt = () => {
+                    canvas.toBlob(blob => {
+                        if (!blob) { reject(new Error('Canvas toBlob failed')); return; }
+                        if (blob.size <= targetBytes || quality <= 0.3) {
+                            resolve(blob);
+                        } else {
+                            quality = Math.max(quality - 0.08, 0.3);
+                            attempt();
+                        }
+                    }, mimeType, quality);
+                };
+                attempt();
+            };
+            img.onerror = () => reject(new Error('Could not load image'));
+            img.src = url;
+        });
+    }
+
+    async function doUpload() {
+        if (!pendingFile || !pendingFilename) {
+            setUploadStatus('No file ready to upload.', 'err'); return;
         }
 
-        // Unique filename
-        const ext      = file.name.split('.').pop();
-        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const photographer = document.getElementById('meta-photographer').value.trim();
+        const dateVal      = document.getElementById('meta-date').value;
+        const world        = document.getElementById('meta-world').value.trim();
+        const type         = document.getElementById('meta-type').value;
+        const notes        = document.getElementById('meta-notes').value.trim();
 
+        if (!photographer) { setUploadStatus('Photographer name is required.', 'err'); return; }
+
+        const btn = document.getElementById('upload-btn');
+        btn.disabled = true;
+        const progWrap = document.getElementById('progress-wrap');
+        const progFill = document.getElementById('progress-fill');
         progWrap.style.display = 'block';
-        progBar.style.width    = '0%';
+        progFill.style.width   = '30%';
         setUploadStatus('Uploading…', '');
 
-        // Supabase storage upload
-        const { error } = await _supabase.storage
+        // 1. Upload file to storage
+        const { error: storageError } = await _supabase.storage
             .from(BUCKET)
-            .upload(filename, file, { cacheControl: '3600', upsert: false });
+            .upload(pendingFilename, pendingFile, { cacheControl: '3600', upsert: false });
 
-        progBar.style.width = '100%';
+        if (storageError) {
+            setUploadStatus('Upload failed: ' + storageError.message, 'err');
+            btn.disabled = false; progWrap.style.display = 'none'; return;
+        }
+        progFill.style.width = '70%';
 
-        if (error) {
-            setUploadStatus('Upload failed: ' + error.message, 'err');
+        // 2. Save metadata row
+        const metaRow = {
+            filename:     pendingFilename,
+            photographer: photographer,
+            taken_at:     dateVal || null,
+            world:        world   || null,
+            type:         type    || null,
+            notes:        notes   || null,
+        };
+
+        const { error: dbError } = await _supabase.from('gallery_photos').insert([metaRow]);
+
+        progFill.style.width = '100%';
+
+        if (dbError) {
+            setUploadStatus('File uploaded but metadata failed: ' + dbError.message, 'err');
         } else {
-            setUploadStatus(`✅ Uploaded as "${filename}"`, 'ok');
+            setUploadStatus('✅ Photo uploaded and saved!', 'ok');
+            // Reset form
+            pendingFile = null; pendingFilename = null;
+            document.getElementById('upload-preview').style.display = 'none';
+            document.getElementById('meta-form').style.display      = 'none';
+            document.getElementById('meta-photographer').value      = '';
+            document.getElementById('meta-date').value              = '';
+            document.getElementById('meta-world').value             = '';
+            document.getElementById('meta-type').value              = '';
+            document.getElementById('meta-notes').value             = '';
+            document.getElementById('file-input').value             = '';
             loadGallery();
         }
-        setTimeout(() => { progWrap.style.display = 'none'; progBar.style.width = '0%'; }, 1500);
+
+        btn.disabled = false;
+        setTimeout(() => { progWrap.style.display = 'none'; progFill.style.width = '0%'; }, 1500);
     }
 
     function setUploadStatus(msg, cls) {
@@ -533,20 +586,55 @@
         el.className   = 'status-msg' + (cls ? ' ' + cls : '');
     }
 
-    // ============================================================
-    //  UTILS
-    // ============================================================
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+    // ---- Load gallery grid ----
+    async function loadGallery() {
+        const grid = document.getElementById('gallery-grid');
+        const { data, error } = await _supabase
+            .from('gallery_photos')
+            .select('*')
+            .order('taken_at', { ascending: false, nullsFirst: false });
+
+        if (error) {
+            grid.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">Could not load photos.</p>'; return;
+        }
+        if (!data || data.length === 0) {
+            grid.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">No photos uploaded yet.</p>'; return;
+        }
+
+        grid.innerHTML = data.map(row => {
+            const { data: urlData } = _supabase.storage.from(BUCKET).getPublicUrl(row.filename);
+            const safeId = row.filename.replace(/[^a-zA-Z0-9]/g, '_');
+            return `
+                <div class="gallery-thumb" id="thumb-${safeId}">
+                    <img src="${urlData.publicUrl}" alt="${esc(row.photographer || '')}" loading="lazy">
+                    <div class="thumb-overlay">
+                        <div class="thumb-type">${esc(row.type || '')}</div>
+                        <div class="thumb-credit">📸 ${esc(row.photographer || 'Unknown')}</div>
+                    </div>
+                    <button class="thumb-delete" onclick="deletePhoto('${row.filename}', ${row.id})">✖</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function deletePhoto(filename, id) {
+        if (!confirm(`Delete this photo permanently?`)) return;
+        // Delete from storage
+        await _supabase.storage.from(BUCKET).remove([filename]);
+        // Delete metadata row
+        await _supabase.from('gallery_photos').delete().eq('id', id);
+        loadGallery();
     }
 
     // ============================================================
-    //  BOOT
+    //  UTILS
     // ============================================================
+    function esc(str) {
+        return String(str || '')
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
     checkSession();
     </script>
 </body>
