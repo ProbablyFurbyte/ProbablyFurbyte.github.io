@@ -14,8 +14,9 @@
         <div class="bubble"></div>
         <div class="bubble"></div>
     </div>
-
     <main class="bento-grid">
+
+        <!-- PROFILE -->
         <article class="bento-box profile-box glass">
             <img src="./assets/images/byte-sunset.jpg" alt="Byte" class="profile-img">
             <div class="profile-text">
@@ -24,11 +25,13 @@
             </div>
         </article>
 
+        <!-- BIO -->
         <article class="bento-box bio-box glass">
             <h2>🫧 Fact</h2>
             <p>Expert at doing nothing</p>
         </article>
 
+        <!-- DISCORD STATUS -->
         <article class="bento-box status-box glass">
             <h2>🍃 Discord Status</h2>
             <p id="discord-status-text">Checking Discord...</p>
@@ -38,27 +41,42 @@
             </div>
         </article>
 
+        <!-- GALLERY -->
         <article class="bento-box gallery-box glass">
             <img src="./assets/images/byte-camera.jpg" alt="Gallery" class="gallery-img" id="gallery-target">
         </article>
 
+        <!-- SOCIALS -->
         <article class="bento-box socials-box glass">
             <h2>🧸 Socials</h2>
             <div class="link-buttons">
-                <a href="https://discord.com/users/416887610233847820" class="social-btn"><span class="icon">💬</span> Discord</a>
-                <a href="https://x.com/ProbablyFurByte" class="social-btn"><span class="icon">🐦</span> Twitter</a>
-                <a href="https://www.youtube.com/@FurByte_" class="social-btn"><span class="icon">📺</span> YouTube</a>
-                <a href="https://steamcommunity.com/id/FurByte/" class="social-btn"><span class="icon">🎮</span> Steam</a>
-                <a href="https://www.tiktok.com/@probablyfurbyte" class="social-btn"><span class="icon">📱</span> TikTok</a>
+                <a href="https://discord.com/users/416887610233847820" class="social-btn selectable"><span class="icon">💬</span> Discord</a>
+                <a href="https://x.com/ProbablyFurByte" class="social-btn selectable"><span class="icon">🐦</span> Twitter</a>
+                <a href="https://www.youtube.com/@FurByte_" class="social-btn selectable"><span class="icon">📺</span> YouTube</a>
+                <a href="https://steamcommunity.com/id/FurByte/" class="social-btn selectable"><span class="icon">🎮</span> Steam</a>
+                <a href="https://www.tiktok.com/@probablyfurbyte" class="social-btn selectable"><span class="icon">📱</span> TikTok</a>
             </div>
         </article>
 
-        <article class="bento-box quotes-box glass">
-            <h2>💭 Thoughts</h2>
-            <p class="quote-text" id="quote-target">"Staying in my own little bubble, where the stars shine a bit brighter."</p>
-            <p class="subtext">— Byte</p>
+        <!-- GUESTBOOK (replaces Thoughts/Quotes) -->
+        <article class="bento-box guestbook-box glass">
+            <h2>📖 Guestbook</h2>
+
+            <!-- Messages feed -->
+            <div class="gb-feed" id="gb-feed">
+                <p class="gb-empty subtext">Loading messages...</p>
+            </div>
+
+            <!-- Submit form -->
+            <div class="gb-form" id="gb-form">
+                <input  type="text" id="gb-name"    class="gb-input" placeholder="Your name"    maxlength="40" autocomplete="off">
+                <textarea              id="gb-message" class="gb-input gb-textarea" placeholder="Leave a message…" maxlength="200" rows="2"></textarea>
+                <button id="gb-submit" class="gb-btn">Send ✉️</button>
+                <p id="gb-status" class="gb-status subtext"></p>
+            </div>
         </article>
 
+        <!-- LOCAL TIME -->
         <article class="bento-box extra-box glass">
             <h2>🌍 Local Time</h2>
             <div class="time-container">
@@ -67,8 +85,11 @@
             </div>
             <p class="subtext">Amsterdam, NL (GMT+1)</p>
         </article>
+
     </main>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 </html>
