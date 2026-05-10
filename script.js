@@ -1,18 +1,29 @@
-const DISCORD_USER_ID = "416887610233847820"; 
+// ============================================================
+//  ⚙️  SUPABASE CONFIG  — fill in your values from the dashboard
+//  Dashboard → Project Settings → API
+// ============================================================
+const SUPABASE_URL      = 'YOUR_SUPABASE_URL';       // e.g. https://xyzxyz.supabase.co
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // long "anon public" key
+
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+//  1.  LANYARD — Discord status + Spotify
+// ============================================================
+const DISCORD_USER_ID = "416887610233847820";
 const LANYARD_URL = `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`;
 
-// --- 1. LANYARD STATUS & KLOK (Behouden) ---
 async function updateStatus() {
     try {
         const response = await fetch(LANYARD_URL);
         const json = await response.json();
-        const dot = document.getElementById('status-dot');
-        const text = document.getElementById('discord-status-text');
-        const label = document.getElementById('status-label');
+        const dot       = document.getElementById('status-dot');
+        const text      = document.getElementById('discord-status-text');
+        const label     = document.getElementById('status-label');
         const statusBox = document.querySelector('.status-box');
 
         if (json.success) {
-            const data = json.data;
+            const data   = json.data;
             const status = data.discord_status;
             const colors = { online: '#43b581', idle: '#faa61a', dnd: '#f04747', offline: '#747f8d' };
             const currentColor = colors[status] || colors.offline;
@@ -26,27 +37,21 @@ async function updateStatus() {
             if (text) {
                 text.classList.add('fade-out');
                 setTimeout(() => {
-                    // --- SPOTIFY LOGICA ---
                     if (data.listening_to_spotify && data.spotify) {
                         text.textContent = `Listening to ${data.spotify.song || data.spotify.track} by ${data.spotify.artist}`;
-                        
                         if (statusBox) {
-                            // Achtergrond instellen
                             statusBox.style.backgroundImage = `linear-gradient(rgba(30, 27, 36, 0.9), rgba(30, 27, 36, 0.9)), url('${data.spotify.album_art_url}')`;
                             statusBox.style.backgroundSize = 'cover';
-                            
-                            // NIEUW: Maak de box klikbaar
                             statusBox.classList.add('is-listening');
                             statusBox.onclick = () => {
                                 window.open(`https://open.spotify.com/track/${data.spotify.track_id}`, '_blank');
                             };
                         }
                     } else {
-                        // --- GEEN SPOTIFY ---
                         if (statusBox) {
                             statusBox.style.backgroundImage = 'none';
                             statusBox.classList.remove('is-listening');
-                            statusBox.onclick = null; // Verwijder de klik-functie
+                            statusBox.onclick = null;
                         }
                         const custom = data.activities.find(a => a.type === 4);
                         text.textContent = (custom && custom.state) ? `"${custom.state}"` : "Expert at doing nothing.";
@@ -55,118 +60,145 @@ async function updateStatus() {
                 }, 400);
             }
         }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('Lanyard error:', e); }
 }
 
+// ============================================================
+//  2.  CLOCK
+// ============================================================
 function updateClock() {
     const now = new Date();
-    const options24 = { timeZone: 'Europe/Amsterdam', hour12: false, hour: '2-digit', minute: '2-digit' };
-    const options12 = { timeZone: 'Europe/Amsterdam', hour12: true, hour: '2-digit', minute: '2-digit' };
-    const time24 = new Intl.DateTimeFormat('nl-NL', options24).format(now);
-    const time12 = new Intl.DateTimeFormat('en-US', options12).format(now);
+    const opts24 = { timeZone: 'Europe/Amsterdam', hour12: false, hour: '2-digit', minute: '2-digit' };
+    const opts12 = { timeZone: 'Europe/Amsterdam', hour12: true,  hour: '2-digit', minute: '2-digit' };
+    const time24 = new Intl.DateTimeFormat('nl-NL', opts24).format(now);
+    const time12 = new Intl.DateTimeFormat('en-US', opts12).format(now);
     const clock24 = document.getElementById('clock-24');
     const clock12 = document.getElementById('clock-12');
     if (clock24) clock24.innerHTML = time24.replace(':', '<span>:</span>');
     if (clock12) clock12.textContent = time12;
 }
 
-// --- 2. NIEUW: GALLERY SLIDESHOW ---
-// Pas deze lijst aan met je eigen foto's!
+// ============================================================
+//  3.  GALLERY SLIDESHOW
+// ============================================================
 const galleryImages = [
     "./assets/images/byte-camera.jpg",
-    "./assets/images/byte-profile.jpg" 
+    "./assets/images/byte-profile.jpg"
 ];
 let currentGalleryIndex = 0;
 const galleryTarget = document.getElementById('gallery-target');
 
 function cycleGallery() {
     if (!galleryTarget || galleryImages.length <= 1) return;
-
-    // Fade out
     galleryTarget.classList.add('fade-out');
-
-    // Wacht tot de fade-out klaar is (matcht CSS 0.5s)
     setTimeout(() => {
-        // Volgende index, of terug naar 0
         currentGalleryIndex = (currentGalleryIndex + 1) % galleryImages.length;
-        // Verander de bron van de afbeelding
         galleryTarget.src = galleryImages[currentGalleryIndex];
-        
-        // Zorg dat de afbeelding geladen is voordat we fade-in doen
-        galleryTarget.onload = () => {
-            galleryTarget.classList.remove('fade-out');
-        };
+        galleryTarget.onload = () => galleryTarget.classList.remove('fade-out');
     }, 500);
 }
 
-// --- 3. NIEUW: THOUGHTS CYCLE ---
-// Pas deze lijst aan met je favoriete quotes of gedachten!
-const thoughtList = [
-    "\"Some people disappear quietly long before they actually leave.\"",
-    "\"The worst feeling is realizing you meant more to someone in your head than in their life.\"",
-    "\"Peace feels unfamiliar when chaos is all you've known.\"",
-    "\"Late nights make honest thoughts louder.\"",
-    "\"Not every sad person cries. Some just get quieter.\"",
-    "\"You outgrow people when you start healing.\"",
-    "\"Sometimes the strongest thing you can do is not react.\"",
-    "\"Being needed is not the same as being loved.\"",
-    "\"The older you get, the more silence starts to feel expensive.\"",
-    "\"A tired soul needs more than sleep.\"",
-    "\"You can miss people and still know they don't belong in your life anymore.\"",
-    "\"Some versions of you only exist in someone else’s memories.\"",
-    "\"There’s a difference between being alone and feeling alone.\"",
-    "\"Growth often looks like losing people you thought would stay forever.\"",
-    "\"The hardest battles are usually invisible.\"",
-    "\"Comfort can become a prison without you noticing.\"",
-    "\"Most people just want someone who truly listens.\"",
-    "\"You don’t always need closure to move on.\"",
-    "\"A calm mind is rarer than a successful life.\"",
-    "\"Sometimes healing means becoming someone your past self wouldn’t recognize.\"",
-    "\"People change slowly, then all at once.\"",
-    "\"Not every connection is meant to last forever.\"",
-    "\"The version of me you created in your mind is not my responsibility.\"",
-    "\"Silence between two people can say everything words failed to.\"",
-    "\"You learn a lot about people when you stop being useful to them.\"",
-    "\"Some memories feel warmer than the people themselves ever did.\"",
-    "\"The right people make you feel safe, not confused.\"",
-    "\"Nobody talks about how lonely self-improvement can feel.\"",
-    "\"You can be surrounded by people and still feel emotionally homeless.\"",
-    "\"Sometimes your mind becomes the place you need saving from.\""
-];
-currentThoughtIndex = 0;
-const quoteTarget = document.getElementById('quote-target');
+// ============================================================
+//  4.  GUESTBOOK
+// ============================================================
+const gbFeed   = document.getElementById('gb-feed');
+const gbName   = document.getElementById('gb-name');
+const gbMsg    = document.getElementById('gb-message');
+const gbSubmit = document.getElementById('gb-submit');
+const gbStatus = document.getElementById('gb-status');
 
-function cycleThoughts() {
-    if (!quoteTarget || thoughtList.length <= 1) return;
+// --- Load approved messages ---
+async function loadGuestbook() {
+    if (!gbFeed) return;
 
-    // Fade out
-    quoteTarget.classList.add('fade-out');
+    const { data, error } = await _supabase
+        .from('guestbook')
+        .select('name, message, created_at')
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-    // Wacht tot de fade-out klaar is (matcht CSS 0.5s)
-    setTimeout(() => {
-        // Volgende index, of terug naar 0
-        currentThoughtIndex = (currentThoughtIndex + 1) % thoughtList.length;
-        // Verander de tekst
-        quoteTarget.textContent = thoughtList[currentThoughtIndex];
-        
-        // Fade in
-        quoteTarget.classList.remove('fade-out');
-    }, 500);
+    if (error) {
+        console.error('Guestbook load error:', error);
+        gbFeed.innerHTML = '<p class="gb-empty subtext">Could not load messages.</p>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        gbFeed.innerHTML = '<p class="gb-empty subtext">No messages yet — be the first! 👋</p>';
+        return;
+    }
+
+    gbFeed.innerHTML = data.map(entry => `
+        <div class="gb-message">
+            <strong>${escapeHtml(entry.name)}</strong>
+            ${escapeHtml(entry.message)}
+        </div>
+    `).join('');
 }
 
-// --- START EN TIMERS ---
-// Start Lanyard & Klok
+// --- Submit a new message ---
+async function submitGuestbook() {
+    const name    = gbName.value.trim();
+    const message = gbMsg.value.trim();
+
+    if (!name || !message) {
+        setGbStatus('Please fill in both fields.', false);
+        return;
+    }
+
+    gbSubmit.disabled = true;
+    setGbStatus('Sending…', null);
+
+    const { error } = await _supabase
+        .from('guestbook')
+        .insert([{ name, message }]);
+
+    if (error) {
+        console.error('Guestbook submit error:', error);
+        setGbStatus('Something went wrong. Try again!', false);
+    } else {
+        gbName.value    = '';
+        gbMsg.value     = '';
+        setGbStatus('Message sent! It will appear after approval. ✨', true);
+    }
+
+    gbSubmit.disabled = false;
+}
+
+function setGbStatus(msg, success) {
+    if (!gbStatus) return;
+    gbStatus.textContent = msg;
+    gbStatus.style.color = success === true  ? '#43b581'
+                         : success === false ? '#f04747'
+                         : 'var(--text-muted)';
+}
+
+// Prevent XSS
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// Wire up submit button
+if (gbSubmit) {
+    gbSubmit.addEventListener('click', submitGuestbook);
+}
+
+// ============================================================
+//  START
+// ============================================================
 updateStatus();
-setInterval(updateStatus, 15000); // Check status elke 15s
+setInterval(updateStatus, 15000);
+
 updateClock();
-setInterval(updateClock, 1000); // Check klok elke 1s
+setInterval(updateClock, 1000);
 
-// Start Gallery Slideshow (Elke 10 seconden)
 if (galleryTarget && galleryImages.length > 1) {
-    setInterval(cycleGallery, 10000); 
+    setInterval(cycleGallery, 10000);
 }
 
-// Start Thoughts Cycle (Elke 20 seconden)
-if (quoteTarget && thoughtList.length > 1) {
-    setInterval(cycleThoughts, 20000); 
-}
+loadGuestbook();
