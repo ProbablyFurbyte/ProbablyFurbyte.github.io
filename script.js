@@ -1,7 +1,13 @@
 const DISCORD_USER_ID = "416887610233847820"; 
 const LANYARD_URL = `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`;
 
-// --- 1. LANYARD STATUS & KLOK (Behouden) ---
+// --- SUPABASE SETUP ---
+// !!! REPLACE THESE WITH YOUR EXACT URL AND PUBLISHABLE KEY !!!
+const SUPABASE_URL = 'YOUR_URL_HERE'; 
+const SUPABASE_KEY = 'YOUR_PUBLISHABLE_KEY_HERE';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// --- 1. LANYARD STATUS & KLOK ---
 async function updateStatus() {
     try {
         const response = await fetch(LANYARD_URL);
@@ -31,11 +37,9 @@ async function updateStatus() {
                         text.textContent = `Listening to ${data.spotify.song || data.spotify.track} by ${data.spotify.artist}`;
                         
                         if (statusBox) {
-                            // Achtergrond instellen
                             statusBox.style.backgroundImage = `linear-gradient(rgba(30, 27, 36, 0.9), rgba(30, 27, 36, 0.9)), url('${data.spotify.album_art_url}')`;
                             statusBox.style.backgroundSize = 'cover';
                             
-                            // NIEUW: Maak de box klikbaar
                             statusBox.classList.add('is-listening');
                             statusBox.onclick = () => {
                                 window.open(`https://open.spotify.com/track/${data.spotify.track_id}`, '_blank');
@@ -46,7 +50,7 @@ async function updateStatus() {
                         if (statusBox) {
                             statusBox.style.backgroundImage = 'none';
                             statusBox.classList.remove('is-listening');
-                            statusBox.onclick = null; // Verwijder de klik-functie
+                            statusBox.onclick = null;
                         }
                         const custom = data.activities.find(a => a.type === 4);
                         text.textContent = (custom && custom.state) ? `"${custom.state}"` : "Expert at doing nothing.";
@@ -70,8 +74,7 @@ function updateClock() {
     if (clock12) clock12.textContent = time12;
 }
 
-// --- 2. NIEUW: GALLERY SLIDESHOW ---
-// Pas deze lijst aan met je eigen foto's!
+// --- 2. GALLERY SLIDESHOW ---
 const galleryImages = [
     "./assets/images/byte-camera.jpg",
     "./assets/images/byte-profile.jpg" 
@@ -81,92 +84,85 @@ const galleryTarget = document.getElementById('gallery-target');
 
 function cycleGallery() {
     if (!galleryTarget || galleryImages.length <= 1) return;
-
-    // Fade out
     galleryTarget.classList.add('fade-out');
-
-    // Wacht tot de fade-out klaar is (matcht CSS 0.5s)
     setTimeout(() => {
-        // Volgende index, of terug naar 0
         currentGalleryIndex = (currentGalleryIndex + 1) % galleryImages.length;
-        // Verander de bron van de afbeelding
         galleryTarget.src = galleryImages[currentGalleryIndex];
         
-        // Zorg dat de afbeelding geladen is voordat we fade-in doen
         galleryTarget.onload = () => {
             galleryTarget.classList.remove('fade-out');
         };
     }, 500);
 }
 
-// --- 3. NIEUW: THOUGHTS CYCLE ---
-// Pas deze lijst aan met je favoriete quotes of gedachten!
-const thoughtList = [
-    "\"Some people disappear quietly long before they actually leave.\"",
-    "\"The worst feeling is realizing you meant more to someone in your head than in their life.\"",
-    "\"Peace feels unfamiliar when chaos is all you've known.\"",
-    "\"Late nights make honest thoughts louder.\"",
-    "\"Not every sad person cries. Some just get quieter.\"",
-    "\"You outgrow people when you start healing.\"",
-    "\"Sometimes the strongest thing you can do is not react.\"",
-    "\"Being needed is not the same as being loved.\"",
-    "\"The older you get, the more silence starts to feel expensive.\"",
-    "\"A tired soul needs more than sleep.\"",
-    "\"You can miss people and still know they don't belong in your life anymore.\"",
-    "\"Some versions of you only exist in someone else’s memories.\"",
-    "\"There’s a difference between being alone and feeling alone.\"",
-    "\"Growth often looks like losing people you thought would stay forever.\"",
-    "\"The hardest battles are usually invisible.\"",
-    "\"Comfort can become a prison without you noticing.\"",
-    "\"Most people just want someone who truly listens.\"",
-    "\"You don’t always need closure to move on.\"",
-    "\"A calm mind is rarer than a successful life.\"",
-    "\"Sometimes healing means becoming someone your past self wouldn’t recognize.\"",
-    "\"People change slowly, then all at once.\"",
-    "\"Not every connection is meant to last forever.\"",
-    "\"The version of me you created in your mind is not my responsibility.\"",
-    "\"Silence between two people can say everything words failed to.\"",
-    "\"You learn a lot about people when you stop being useful to them.\"",
-    "\"Some memories feel warmer than the people themselves ever did.\"",
-    "\"The right people make you feel safe, not confused.\"",
-    "\"Nobody talks about how lonely self-improvement can feel.\"",
-    "\"You can be surrounded by people and still feel emotionally homeless.\"",
-    "\"Sometimes your mind becomes the place you need saving from.\""
-];
-currentThoughtIndex = 0;
-const quoteTarget = document.getElementById('quote-target');
+// --- 3. GUESTBOOK LOGIC ---
+const gbForm = document.getElementById('guestbook-form');
+const gbList = document.getElementById('guestbook-list');
 
-function cycleThoughts() {
-    if (!quoteTarget || thoughtList.length <= 1) return;
+async function loadMessages() {
+    if (!gbList) return;
+    
+    // Fetch only approved messages
+    const { data, error } = await supabase
+        .from('guestbook')
+        .select('*')
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false });
 
-    // Fade out
-    quoteTarget.classList.add('fade-out');
+    if (error) {
+        gbList.innerHTML = '<p class="subtext">Could not load messages.</p>';
+        return;
+    }
 
-    // Wacht tot de fade-out klaar is (matcht CSS 0.5s)
-    setTimeout(() => {
-        // Volgende index, of terug naar 0
-        currentThoughtIndex = (currentThoughtIndex + 1) % thoughtList.length;
-        // Verander de tekst
-        quoteTarget.textContent = thoughtList[currentThoughtIndex];
-        
-        // Fade in
-        quoteTarget.classList.remove('fade-out');
-    }, 500);
+    gbList.innerHTML = ''; 
+    if (data.length === 0) {
+        gbList.innerHTML = '<p class="subtext">No messages yet. Be the first!</p>';
+        return;
+    }
+
+    // Build the messages into the HTML
+    data.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'gb-msg';
+        div.innerHTML = `<span>${msg.name}</span><p>${msg.message}</p>`;
+        gbList.appendChild(div);
+    });
+}
+
+if (gbForm) {
+    gbForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nameInput = document.getElementById('gb-name');
+        const msgInput = document.getElementById('gb-message');
+        const btn = gbForm.querySelector('button');
+
+        btn.innerText = '...'; 
+
+        // Insert new message (defaults to unapproved)
+        const { error } = await supabase
+            .from('guestbook')
+            .insert([{ name: nameInput.value, message: msgInput.value }]);
+
+        if (!error) {
+            alert("Thanks! Your message has been sent to Byte for approval 🫧");
+            nameInput.value = '';
+            msgInput.value = '';
+        } else {
+            alert("Oops, something went wrong.");
+        }
+        btn.innerText = 'Sign';
+    });
 }
 
 // --- START EN TIMERS ---
-// Start Lanyard & Klok
 updateStatus();
-setInterval(updateStatus, 15000); // Check status elke 15s
+setInterval(updateStatus, 15000); 
 updateClock();
-setInterval(updateClock, 1000); // Check klok elke 1s
+setInterval(updateClock, 1000); 
 
-// Start Gallery Slideshow (Elke 10 seconden)
 if (galleryTarget && galleryImages.length > 1) {
     setInterval(cycleGallery, 10000); 
 }
 
-// Start Thoughts Cycle (Elke 20 seconden)
-if (quoteTarget && thoughtList.length > 1) {
-    setInterval(cycleThoughts, 20000); 
-}
+// Load guestbook messages on startup
+loadMessages();
