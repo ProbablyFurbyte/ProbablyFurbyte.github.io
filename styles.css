@@ -22,7 +22,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Scroll-fix (Nieuw) */
+/* Scroll-fix */
 @media (min-width: 768px) {
     body { overflow: hidden; height: 100vh; }
 }
@@ -30,7 +30,7 @@ body {
     body { overflow-y: auto; align-items: flex-start; }
 }
 
-/* --- BENTO GRID LOGIC --- */
+/* --- BENTO GRID --- */
 .bento-grid {
     display: grid;
     gap: 1.5rem;
@@ -41,9 +41,9 @@ body {
 }
 
 .gallery-box {
-    padding: 0 !important; /* Haalt de padding weg zodat de foto de rand raakt */
-    overflow: hidden;      /* Zorgt dat de foto binnen de ronde hoeken blijft */
-    display: flex;         /* Verwijdert witruimte onder de afbeelding */
+    padding: 0 !important;
+    overflow: hidden;
+    display: flex;
 }
 
 @media (min-width: 768px) {
@@ -52,16 +52,16 @@ body {
         grid-template-areas: 
             "profile profile bio"
             "profile profile status"
-            "gallery socials quotes"
+            "gallery socials guestbook"
             "gallery socials extra";
     }
-    .profile-box { grid-area: profile; }
-    .bio-box { grid-area: bio; }
-    .status-box { grid-area: status; }
-    .gallery-box { grid-area: gallery; grid-row: span 2; }
-    .socials-box { grid-area: socials; grid-row: span 2; }
-    .quotes-box { grid-area: quotes; }
-    .extra-box { grid-area: extra; }
+    .profile-box    { grid-area: profile; }
+    .bio-box        { grid-area: bio; }
+    .status-box     { grid-area: status; }
+    .gallery-box    { grid-area: gallery; grid-row: span 2; }
+    .socials-box    { grid-area: socials; grid-row: span 2; }
+    .guestbook-box  { grid-area: guestbook; }
+    .extra-box      { grid-area: extra; }
 }
 
 /* --- GLASS STYLE --- */
@@ -93,10 +93,10 @@ body {
     height: 100%; 
     width: 100%; 
     object-fit: cover; 
-    border-radius: 0;      /* We gebruiken de border-radius van de box zelf nu */
+    border-radius: 0;
     min-height: 300px; 
     transition: opacity 0.5s ease;
-    transform: scale(1.01); /* Een piepkleine zoom om dat witte lijntje te overlappen */
+    transform: scale(1.01);
 }
 
 /* TYPOGRAPHY */
@@ -113,11 +113,11 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
 .main-time span { animation: blink 2s infinite; }
 .sub-time { font-size: 0.9rem; color: var(--accent-glow); font-weight: 700; text-transform: uppercase; }
 
-/* FADE CLASSES VOOR JS */
+/* FADE CLASSES */
 .fade-out { opacity: 0; }
-.fade-in { opacity: 1; }
+.fade-in  { opacity: 1; }
 
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes blink     { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
 
 /* --- SOCIALS --- */
@@ -129,10 +129,104 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
 }
 .social-btn:hover { background: rgba(199, 116, 232, 0.15); border-color: var(--accent-glow); transform: translateX(5px); }
 
-/* --- THOUGHTS --- */
-.quote-text {
-    font-style: italic; font-size: 0.9rem; line-height: 1.4; margin-bottom: 10px;
-    transition: opacity 0.5s ease; /* NIEUW: Voor vloeiende wissel */
+/* --- GUESTBOOK --- */
+.guestbook-box {
+    /* Inherits .glass — just needs overflow for the feed scroll */
+    overflow: hidden;
+}
+
+/* Scrollable feed area — fits within the box */
+.gb-feed {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-right: 4px;
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-glow) transparent;
+}
+.gb-feed::-webkit-scrollbar       { width: 4px; }
+.gb-feed::-webkit-scrollbar-track { background: transparent; }
+.gb-feed::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 4px; }
+
+/* Individual message bubble */
+.gb-message {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
+.gb-message strong {
+    color: var(--accent-glow);
+    font-size: 0.72rem;
+    display: block;
+    margin-bottom: 2px;
+}
+.gb-empty {
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Form inputs */
+.gb-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 6px;
+    /* Allow typing */
+    -webkit-user-select: text;
+    user-select: text;
+    pointer-events: auto;
+}
+.gb-input:focus {
+    border-color: var(--accent-glow);
+}
+.gb-input::placeholder {
+    color: var(--text-muted);
+}
+.gb-textarea {
+    min-height: 48px;
+}
+
+/* Send button */
+.gb-btn {
+    width: 100%;
+    background: rgba(199, 116, 232, 0.15);
+    border: 1px solid var(--accent-glow);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    pointer-events: auto;
+}
+.gb-btn:hover   { background: rgba(199, 116, 232, 0.3); }
+.gb-btn:active  { transform: scale(0.97); }
+.gb-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Status text under button */
+.gb-status {
+    margin-top: 5px;
+    min-height: 1em;
+    text-align: center;
+    font-size: 0.75rem;
 }
 
 /* --- BUBBLES --- */
@@ -148,29 +242,21 @@ h2 { font-size: 1.1rem; color: var(--accent-glow); margin-bottom: 12px; text-tra
 .bubble:nth-child(3) { width: 150px; height: 150px; left: 80%; animation-delay: 12s; }
 .bubble:nth-child(4) { width: 250px; height: 250px; left: 20%; animation-delay: 18s; }
 
-.status-box.is-listening {
-    cursor: pointer;
-}
+/* --- SPOTIFY CLICK --- */
+.status-box.is-listening { cursor: pointer; }
+.status-box.is-listening:active { transform: scale(0.98); }
 
-.status-box.is-listening:active {
-    transform: scale(0.98); /* Kleine "klik" animatie */
-}
-/* Schakel selecteren en slepen uit voor de hele site */
+/* --- PREVENT TEXT SELECTION & DRAG --- */
 html, body {
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none;     /* IE 10 en Edge */
-    user-select: none;         /* Standaard (Chrome, Firefox, etc.) */
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
-
-/* Zorg dat afbeeldingen niet gesleept kunnen worden */
 img {
     -webkit-user-drag: none;
     user-drag: none;
-    pointer-events: none; /* Dit voorkomt ook dat mensen rechtsklikken om op te slaan */
+    pointer-events: none;
 }
-
-/* OPTIONEEL: Wil je dat bepaalde tekst (zoals je Discord naam of links) WEL kopieerbaar blijft? */
-/* Voeg dan de class 'selectable' toe aan die elementen in HTML en gebruik dit: */
 .selectable {
     -webkit-user-select: text;
     user-select: text;
